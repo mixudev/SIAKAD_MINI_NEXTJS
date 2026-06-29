@@ -113,7 +113,7 @@ export default function KrsPage() {
   }
 
   const status = krsData?.status as KrsStatus | undefined
-  const canEdit = status === 'draft' || status === 'ditolak'
+  const canEdit = !krsData || status === 'draft' || status === 'ditolak'
   const canSubmit = canEdit && (krsData?.krs_detail?.length || 0) > 0
   const sksTerisi = krsData?.total_sks || 0
 
