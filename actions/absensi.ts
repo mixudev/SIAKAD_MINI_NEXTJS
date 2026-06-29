@@ -180,7 +180,7 @@ export async function getMahasiswaForAbsensiAction(pertemuanId: string) {
   try {
     const { data: pertemuan } = await adminClient
       .from('pertemuan')
-      .select('*, kelas!inner(*)')
+      .select('*, kelas!inner(*, mata_kuliah(*))')
       .eq('id', pertemuanId)
       .maybeSingle()
     if (!pertemuan) return { success: false, error: 'Pertemuan tidak ditemukan', data: [] }

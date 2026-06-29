@@ -89,7 +89,7 @@ export default function KrsBimbinganPage() {
   const handleApprove = () => {
     if (!detail) return
     startTransition(async () => {
-      const res = await approveKrsAction(detail.krs.id)
+      const res = await approveKrsAction(detail.id)
       if (res.success) {
         toast.success('KRS disetujui')
         setShowApprove(false)
@@ -104,7 +104,7 @@ export default function KrsBimbinganPage() {
   const handleReject = () => {
     if (!detail) return
     startTransition(async () => {
-      const res = await rejectKrsAction(detail.krs.id, rejectNote)
+      const res = await rejectKrsAction(detail.id, rejectNote)
       if (res.success) {
         toast.success('KRS ditolak')
         setShowReject(false)
@@ -118,11 +118,12 @@ export default function KrsBimbinganPage() {
   }
 
   const filtered = data.filter(item => {
-    if (filter !== 'semua' && item.status !== filter) return false
+    const status = item.status || 'belum'
+    if (filter !== 'semua' && status !== filter) return false
     if (search) {
       const s = search.toLowerCase()
-      const matchNama = item.mahasiswa?.nama_lengkap?.toLowerCase().includes(s)
-      const matchNim = item.mahasiswa?.nim?.toLowerCase().includes(s)
+      const matchNama = item.nama_lengkap?.toLowerCase().includes(s)
+      const matchNim = item.nim?.toLowerCase().includes(s)
       if (!matchNama && !matchNim) return false
     }
     return true
@@ -185,28 +186,35 @@ export default function KrsBimbinganPage() {
             <TableBody>
               {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               {filtered.map((item: any) => (
-                <TableRow key={item.id} className="border-b border-[#ececee]">
-                  <TableCell className="text-sm font-mono font-medium text-[#09090b]">{item.mahasiswa?.nim || '—'}</TableCell>
-                  <TableCell className="text-sm font-medium text-[#09090b]">{item.mahasiswa?.nama_lengkap || '—'}</TableCell>
+                <TableRow key={item.id || item.nim} className="border-b border-[#ececee]">
+                  <TableCell className="text-sm font-mono font-medium text-[#09090b]">{item.nim || '—'}</TableCell>
+                  <TableCell className="text-sm font-medium text-[#09090b]">{item.nama_lengkap || '—'}</TableCell>
                   <TableCell className="text-sm text-[#52525b]">{item.total_kelas || 0}</TableCell>
                   <TableCell className="text-sm text-[#52525b]">{item.total_sks || 0}</TableCell>
                   <TableCell>
-                    <Badge className={`rounded-[4px] text-[10px] font-semibold ${
-                      item.status === 'disetujui' ? 'bg-[#f0fdf4] text-[#15803d] border border-[#bbf7d0]' :
-                      item.status === 'diajukan' ? 'bg-[#fefce8] text-[#a16207] border border-[#fef08a]' :
-                      item.status === 'ditolak' ? 'bg-[#fef2f2] text-[#b91c1c] border border-[#fecaca]' :
-                      'bg-[#f4f4f5] text-[#71717a] border border-[#d4d4d8]'
-                    }`}>
-                      {item.status === 'disetujui' ? 'Disetujui' :
-                       item.status === 'diajukan' ? 'Menunggu' :
-                       item.status === 'ditolak' ? 'Ditolak' : 'Draft'}
-                    </Badge>
+                    {!item.status ? (
+                      <Badge className="rounded-[4px] text-[10px] font-semibold bg-[#eff6ff] text-[#1d4ed8] border border-[#bfdbfe]">
+                        Belum Ada KRS
+                      </Badge>
+                    ) : (
+                      <Badge className={`rounded-[4px] text-[10px] font-semibold ${
+                        item.status === 'disetujui' ? 'bg-[#f0fdf4] text-[#15803d] border border-[#bbf7d0]' :
+                        item.status === 'diajukan' ? 'bg-[#fefce8] text-[#a16207] border border-[#fef08a]' :
+                        item.status === 'ditolak' ? 'bg-[#fef2f2] text-[#b91c1c] border border-[#fecaca]' :
+                        'bg-[#f4f4f5] text-[#71717a] border border-[#d4d4d8]'
+                      }`}>
+                        {item.status === 'disetujui' ? 'Disetujui' :
+                         item.status === 'diajukan' ? 'Menunggu' :
+                         item.status === 'ditolak' ? 'Ditolak' : 'Draft'}
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => openDetail(item.id)}
+                      disabled={!item.id}
+                      onClick={() => item.id && openDetail(item.id)}
                       className="h-7 px-2 text-[10px] font-semibold border-[#d4d4d8] rounded-[6px]"
                     >
                       <Eye className="size-3 mr-1" />
@@ -234,23 +242,23 @@ export default function KrsBimbinganPage() {
             <div className="px-6 pb-6">
               {/* Info banner */}
               <div className={`flex items-center gap-2 px-4 py-2.5 rounded-[8px] text-xs font-medium mb-4 border ${
-                detail.krs.status === 'disetujui' ? 'bg-[#f0fdf4] text-[#15803d] border-[#bbf7d0]' :
-                detail.krs.status === 'diajukan' ? 'bg-[#fefce8] text-[#a16207] border-[#fef08a]' :
-                detail.krs.status === 'ditolak' ? 'bg-[#fef2f2] text-[#b91c1c] border-[#fecaca]' :
+                detail.status === 'disetujui' ? 'bg-[#f0fdf4] text-[#15803d] border-[#bbf7d0]' :
+                detail.status === 'diajukan' ? 'bg-[#fefce8] text-[#a16207] border-[#fef08a]' :
+                detail.status === 'ditolak' ? 'bg-[#fef2f2] text-[#b91c1c] border-[#fecaca]' :
                 'bg-[#f4f4f5] text-[#71717a] border-[#d4d4d8]'
               }`}>
-                {detail.krs.status === 'disetujui' ? <CheckCircle2 className="size-4 shrink-0" /> :
-                 detail.krs.status === 'diajukan' ? <Loader2 className="size-4 shrink-0" /> :
-                 detail.krs.status === 'ditolak' ? <XCircle className="size-4 shrink-0" /> :
+                {detail.status === 'disetujui' ? <CheckCircle2 className="size-4 shrink-0" /> :
+                 detail.status === 'diajukan' ? <Loader2 className="size-4 shrink-0" /> :
+                 detail.status === 'ditolak' ? <XCircle className="size-4 shrink-0" /> :
                  <BookOpen className="size-4 shrink-0" />}
                 <span>
                   Status: <strong>{
-                    detail.krs.status === 'disetujui' ? 'Disetujui' :
-                    detail.krs.status === 'diajukan' ? 'Menunggu Approval' :
-                    detail.krs.status === 'ditolak' ? 'Ditolak' : 'Draft'
+                    detail.status === 'disetujui' ? 'Disetujui' :
+                    detail.status === 'diajukan' ? 'Menunggu Approval' :
+                    detail.status === 'ditolak' ? 'Ditolak' : 'Draft'
                   }</strong>
-                  {detail.krs.status === 'ditolak' && detail.krs.catatan_dosen_pa && (
-                    <span className="ml-2">— {detail.krs.catatan_dosen_pa}</span>
+                  {detail.status === 'ditolak' && detail.catatan_dosen_pa && (
+                    <span className="ml-2">— {detail.catatan_dosen_pa}</span>
                   )}
                 </span>
               </div>
@@ -284,7 +292,7 @@ export default function KrsBimbinganPage() {
               </div>
 
               {/* Action Buttons */}
-              {(detail.krs.status === 'diajukan') && (
+              {(detail.status === 'diajukan') && (
                 <div className="flex items-center justify-end gap-2 mt-6 pt-4 border-t border-[#ececee]">
                   <Button
                     variant="outline"

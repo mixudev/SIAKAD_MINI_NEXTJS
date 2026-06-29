@@ -72,12 +72,62 @@ export default function SemesterPage() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
+  const getNextSemester = () => {
+    if (semesters.length === 0) {
+      const year = new Date().getFullYear()
+      return {
+        nama: 'Ganjil',
+        tahun: `${year}/${year + 1}`,
+        mulai: `${year}-09-01`,
+        selesai: `${year + 1}-01-31`,
+      }
+    }
+    const sorted = [...semesters].sort((a, b) => b.tahun_akademik.localeCompare(a.tahun_akademik) || b.nama.localeCompare(a.nama))
+    const last = sorted[0]
+    if (last.nama.includes('Ganjil')) {
+      const [, t2] = last.tahun_akademik.split('/')
+      return {
+        nama: 'Genap',
+        tahun: `${last.tahun_akademik}`,
+        mulai: `${t2}-02-01`,
+        selesai: `${t2}-06-30`,
+      }
+    }
+    if (last.nama.includes('Genap')) {
+      const [, t2] = last.tahun_akademik.split('/')
+      const nextYear = parseInt(t2)
+      return {
+        nama: 'Ganjil',
+        tahun: `${nextYear}/${nextYear + 1}`,
+        mulai: `${nextYear}-09-01`,
+        selesai: `${nextYear + 1}-01-31`,
+      }
+    }
+    const year = new Date().getFullYear()
+    return {
+      nama: 'Ganjil',
+      tahun: `${year}/${year + 1}`,
+      mulai: `${year}-09-01`,
+      selesai: `${year + 1}-01-31`,
+    }
+  }
+
   const resetForm = () => {
     setFormNama('')
     setFormTahun('')
     setFormMulai('')
     setFormSelesai('')
     setFormError('')
+  }
+
+  const openAddModal = () => {
+    const next = getNextSemester()
+    setFormNama(next.nama)
+    setFormTahun(next.tahun)
+    setFormMulai(next.mulai)
+    setFormSelesai(next.selesai)
+    setFormError('')
+    setShowAddModal(true)
   }
 
   const handleAdd = () => {
@@ -140,7 +190,7 @@ export default function SemesterPage() {
         title="Manajemen Semester"
         description="Kelola periode semester akademik"
         action={
-          <Button onClick={() => { resetForm(); setShowAddModal(true) }} className="bg-[#09090b] hover:bg-[#18181b] text-white rounded-[8px] text-xs font-semibold h-9 px-4">
+          <Button onClick={openAddModal} className="bg-[#09090b] hover:bg-[#18181b] text-white rounded-[8px] text-xs font-semibold h-9 px-4">
             <Plus className="size-4 mr-1.5" />
             Tambah Semester
           </Button>

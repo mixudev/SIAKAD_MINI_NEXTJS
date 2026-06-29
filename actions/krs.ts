@@ -119,10 +119,10 @@ export async function getAvailableKelasAction() {
 
     const { data: kelas, error: kelasErr } = await adminClient
       .from('kelas')
-      .select('*, mata_kuliah(*), dosen(nama_lengkap), semester(*), jadwal(*)')
+      .select('*, mata_kuliah!inner(*), dosen(nama_lengkap), semester(*), jadwal(*)')
       .eq('semester_id', sem.id)
-      .in('mata_kuliah.program_studi_id', [mhs.program_studi_id])
-      .order('mata_kuliah.nama', { ascending: true })
+      .eq('mata_kuliah.program_studi_id', mhs.program_studi_id)
+      .order('mata_kuliah(nama)', { ascending: true })
 
     if (kelasErr) throw kelasErr
 
@@ -548,9 +548,38 @@ export async function getKrsBimbinganAction() {
       .in('mahasiswa_id', mhsIds)
       .eq('semester_id', sem.id)
 
+    // Hitung total_kelas & total_sks per KRS
+    const krsDetailCounts = new Map<string, { total_kelas: number; total_sks: number }>()
+    for (const k of krsList || []) {
+      const { data: details } = await adminClient
+        .from('krs_detail')
+        .select('kelas!inner(mata_kuliah(sks))')
+        .eq('krs_id', k.id)
+      let totalSks = 0
+      for (const d of details || []) {
+        const sks = (d.kelas as unknown as { mata_kuliah: { sks: number } })?.mata_kuliah?.sks || 0
+        totalSks += sks
+      }
+      krsDetailCounts.set(k.id, {
+        total_kelas: details?.length || 0,
+        total_sks: totalSks,
+      })
+    }
+
     const enriched = mahasiswaList.map(m => {
       const krs = krsList?.find(k => k.mahasiswa_id === m.id) || null
-      return { ...m, krs }
+      const counts = krs ? krsDetailCounts.get(krs.id) : { total_kelas: 0, total_sks: 0 }
+      return {
+        id: krs?.id || null,
+        nim: m.nim,
+        nama_lengkap: m.nama_lengkap,
+        program_studi: m.program_studi,
+        status: krs?.status || null,
+        tanggal_pengajuan: krs?.tanggal_pengajuan || null,
+        catatan_dosen_pa: krs?.catatan_dosen_pa || null,
+        total_kelas: counts?.total_kelas || 0,
+        total_sks: counts?.total_sks || 0,
+      }
     })
 
     return { success: true, data: enriched, semester: sem }
