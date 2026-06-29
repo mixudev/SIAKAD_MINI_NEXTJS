@@ -2,6 +2,7 @@
 
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
+import { getCurrentUser, isAuthorized } from '@/lib/auth-utils'
 
 // Admin Client to bypass RLS for lookups and user management
 const getAdminClient = () => {
@@ -141,16 +142,23 @@ export async function updateStudentAction(
     username?: string
   }
 ) {
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
 
   try {
-    // 1. Update public.users
-    const { error: userError } = await adminClient
-      .from('users')
-      .update({ username: data.username })
-      .eq('id', userId)
+    // 1. Update public.users (only if username provided)
+    if (data.username) {
+      const { error: userError } = await adminClient
+        .from('users')
+        .update({ username: data.username })
+        .eq('id', userId)
 
-    if (userError) throw userError
+      if (userError) throw userError
+    }
 
     // 2. Update public.mahasiswa
     const { error: mhsError } = await adminClient
@@ -186,16 +194,23 @@ export async function updateLecturerAction(
     username?: string
   }
 ) {
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
 
   try {
-    // 1. Update public.users
-    const { error: userError } = await adminClient
-      .from('users')
-      .update({ username: data.username })
-      .eq('id', userId)
+    // 1. Update public.users (only if username provided)
+    if (data.username) {
+      const { error: userError } = await adminClient
+        .from('users')
+        .update({ username: data.username })
+        .eq('id', userId)
 
-    if (userError) throw userError
+      if (userError) throw userError
+    }
 
     // 2. Update public.dosen
     const { error: dosenError } = await adminClient
@@ -221,6 +236,11 @@ export async function updateLecturerAction(
  * Reset User Password
  */
 export async function resetPasswordAction(userId: string, newPassword: string) {
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
 
   try {
@@ -241,16 +261,26 @@ export async function resetPasswordAction(userId: string, newPassword: string) {
  * Deactivate / Ban User from Supabase Auth
  */
 export async function toggleUserBanAction(userId: string, shouldBan: boolean) {
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
 
   try {
-    // Suspend user by updating ban duration or deleting user's active session.
-    // In Supabase, setting ban_duration to a very long time locks the account.
-    const banDuration = shouldBan ? '876000h' : '0h' // 100 years or 0 hours
-
-    const { error } = await adminClient.auth.admin.updateUserById(userId, {
-      ban_duration: banDuration,
-    })
+    if (shouldBan) {
+      const { error } = await adminClient.auth.admin.updateUserById(userId, {
+        ban_duration: '876000h',
+      })
+      if (error) throw error
+    } else {
+      // Unban: clear ban_duration by setting to empty string
+      const { error } = await adminClient.auth.admin.updateUserById(userId, {
+        ban_duration: '',
+      })
+      if (error) throw error
+    }
 
     if (error) throw error
 

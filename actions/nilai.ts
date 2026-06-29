@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
+import { komponenNilaiSchema } from '@/lib/validations/nilai'
 
 const getAdminClient = () => {
   return createSupabaseClient(
@@ -115,18 +116,39 @@ export async function upsertKomponenNilaiAction(formData: FormData) {
   if (!user) return { success: false, error: 'Unauthorized' }
 
   try {
+    const komponenId = formData.get('komponen_id') as string | null
     const kelasId = formData.get('kelas_id') as string
     const nama = formData.get('nama_komponen') as string
     const bobot = parseFloat(formData.get('bobot_persen') as string)
 
-    if (!kelasId || !nama || isNaN(bobot)) {
-      return { success: false, error: 'Semua field wajib diisi' }
-    }
-    if (bobot < 1 || bobot > 100) {
-      return { success: false, error: 'Bobot harus 1-100' }
+    const parsed = komponenNilaiSchema.safeParse({ kelas_id: kelasId, nama_komponen: nama, bobot_persen: bobot })
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') }
     }
 
-    // Check total bobot
+    if (komponenId) {
+      // UPDATE existing komponen
+      const { error } = await adminClient
+        .from('komponen_nilai')
+        .update({ nama_komponen: nama, bobot_persen: bobot })
+        .eq('id', komponenId)
+
+      if (error) throw error
+
+      await recalculateNilaiAkhir(kelasId)
+      revalidatePath(`/dosen/input-nilai/${kelasId}`)
+
+      // Get updated total bobot
+      const { data: all } = await adminClient
+        .from('komponen_nilai')
+        .select('bobot_persen')
+        .eq('kelas_id', kelasId)
+      const newTotal = (all || []).reduce((sum, k) => sum + Number(k.bobot_persen), 0)
+
+      return { success: true, total_bobot_baru: newTotal }
+    }
+
+    // INSERT new komponen
     const { data: existing } = await adminClient
       .from('komponen_nilai')
       .select('bobot_persen')
@@ -448,7 +470,7 @@ export async function getAdminPenilaianAction() {
 
     const { data: kelasList } = await adminClient
       .from('kelas')
-      .select('*, mata_kuliah(*, program_studi(id, nama, singkatan)), semester(*), dosen(id, nidn, nama_lengkap)')
+      .select('*, mata_kuliah(*, program_studi(id, nama, kode)), semester(*), dosen(id, nidn, nama_lengkap)')
       .eq('semester_id', sem.id)
       .order('nama_kelas', { ascending: true })
 
@@ -505,7 +527,7 @@ export async function getKhsAction() {
   try {
     const { data: mhs } = await adminClient
       .from('mahasiswa')
-      .select('id, nim, nama_lengkap, program_studi(nama, singkatan)')
+      .select('id, nim, nama_lengkap, program_studi(nama, kode)')
       .eq('user_id', user.id)
       .maybeSingle()
     if (!mhs) return { success: false, error: 'Data mahasiswa tidak ditemukan', data: [] }

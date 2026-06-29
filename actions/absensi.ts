@@ -3,6 +3,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
+import { absensiItemSchema } from '@/lib/validations/absensi'
+import { z } from 'zod'
 
 const getAdminClient = () => {
   return createSupabaseClient(
@@ -236,10 +238,14 @@ export async function saveAbsensiAction(pertemuanId: string, absensiData: Array<
   if (!user) return { success: false, error: 'Unauthorized' }
 
   try {
-    // Validate all entries have status
-    const incomplete = absensiData.filter(d => !d.status)
-    if (incomplete.length > 0) {
-      return { success: false, error: `${incomplete.length} mahasiswa belum dipilih statusnya` }
+    // Validate with Zod
+    const bulkSchema = z.object({
+      pertemuan_id: z.string().min(1),
+      data: z.array(absensiItemSchema).min(1),
+    })
+    const parsed = bulkSchema.safeParse({ pertemuan_id: pertemuanId, data: absensiData })
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues.map(e => e.message).join(', ') }
     }
 
     // Upsert each record (delete existing then insert fresh)
@@ -271,7 +277,14 @@ export async function saveAbsensiAction(pertemuanId: string, absensiData: Array<
       alpa: records.filter(r => r.status === 'alpa').length,
     }
 
-    revalidatePath(`/dosen/absensi/${pertemuanId.split('_')[0]}`)
+    // Get kelas_id from pertemuan for correct revalidation path
+    const { data: pertemuan } = await adminClient
+      .from('pertemuan')
+      .select('kelas_id')
+      .eq('id', pertemuanId)
+      .maybeSingle()
+
+    revalidatePath(`/dosen/absensi/${pertemuan?.kelas_id || ''}`)
     return { success: true, summary }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error'
@@ -487,7 +500,7 @@ export async function getAdminAbsensiAction(params?: {
 
     let query = adminClient
       .from('kelas')
-      .select('*, mata_kuliah(*, program_studi(id, nama, singkatan)), semester(*), dosen(id, nidn, nama_lengkap)')
+      .select('*, mata_kuliah(*, program_studi(id, nama, kode)), semester(*), dosen(id, nidn, nama_lengkap)')
       .eq('semester_id', semId)
 
     if (params?.prodiId) {

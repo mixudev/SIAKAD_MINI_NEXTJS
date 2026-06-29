@@ -335,7 +335,7 @@ export async function getTranskripAction() {
   try {
     const { data: mhs } = await adminClient
       .from('mahasiswa')
-      .select('id, nim, nama_lengkap, program_studi(nama, singkatan)')
+      .select('id, nim, nama_lengkap, program_studi(nama, kode)')
       .eq('user_id', user.id)
       .maybeSingle()
     if (!mhs) return { success: false, error: 'Data mahasiswa tidak ditemukan' }

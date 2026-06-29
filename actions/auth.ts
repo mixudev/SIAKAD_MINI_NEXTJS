@@ -194,7 +194,8 @@ export async function registerUserAction(userData: {
 
     return { success: true, userId }
   } catch (dbError: unknown) {
-    // Simulated Transaction Rollback: delete auth user if DB insert fails
+    // Simulated Transaction Rollback: delete public.users + auth user if DB insert fails
+    await adminClient.from('users').delete().eq('id', userId)
     await adminClient.auth.admin.deleteUser(userId)
     const message = dbError instanceof Error ? dbError.message : 'Unknown error'
     return { success: false, error: 'Gagal sinkronisasi data profil: ' + message }

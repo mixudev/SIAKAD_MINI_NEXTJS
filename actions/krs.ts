@@ -122,7 +122,7 @@ export async function getAvailableKelasAction() {
       .select('*, mata_kuliah(*), dosen(nama_lengkap), semester(*), jadwal(*)')
       .eq('semester_id', sem.id)
       .in('mata_kuliah.program_studi_id', [mhs.program_studi_id])
-      .order('created_at', { ascending: true })
+      .order('mata_kuliah.nama', { ascending: true })
 
     if (kelasErr) throw kelasErr
 
@@ -149,6 +149,11 @@ export async function getAvailableKelasAction() {
 // ============================================================
 // KRS — ADD KELAS
 // ============================================================
+
+function timeToMinutes(time: string): number {
+  const [h, m] = time.split(':').map(Number)
+  return h * 60 + m
+}
 
 function getMaxSksByIpk(ipk: number | null): number {
   if (ipk === null) return 24
@@ -233,10 +238,10 @@ export async function addKelasToKrsAction(kelasId: string) {
         for (const baru of jadwalBaru) {
           for (const lama of jadwalExisting) {
             if (baru.hari !== lama.hari) continue
-            const bMulai = baru.jam_mulai
-            const bSelesai = baru.jam_selesai
-            const lMulai = lama.jam_mulai
-            const lSelesai = lama.jam_selesai
+            const bMulai = timeToMinutes(baru.jam_mulai)
+            const bSelesai = timeToMinutes(baru.jam_selesai)
+            const lMulai = timeToMinutes(lama.jam_mulai)
+            const lSelesai = timeToMinutes(lama.jam_selesai)
             if (bMulai < lSelesai && bSelesai > lMulai) {
               return { success: false, error: `Jadwal bentrok dengan kelas yang sudah diambil (${baru.hari} ${baru.jam_mulai?.slice(0,5)}-${baru.jam_selesai?.slice(0,5)})` }
             }
@@ -750,7 +755,7 @@ export async function getAllKrsAdminAction(params: {
     const to = from + limit - 1
 
     const { data, count, error } = await query
-      .order('created_at', { ascending: false })
+      .order('tanggal_pengajuan', { ascending: false, nullsFirst: false })
       .range(from, to)
 
     if (error) throw error

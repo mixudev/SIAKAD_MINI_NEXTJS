@@ -59,7 +59,9 @@ CREATE TABLE IF NOT EXISTS public.semester (
   tahun_akademik text NOT NULL,
   tanggal_mulai date NOT NULL,
   tanggal_selesai date NOT NULL,
-  is_active boolean DEFAULT false NOT NULL
+  is_active boolean DEFAULT false NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 -- Index to enforce only ONE active semester at any time
@@ -84,7 +86,9 @@ CREATE TABLE IF NOT EXISTS public.kelas (
   semester_id uuid REFERENCES public.semester(id) ON DELETE CASCADE NOT NULL,
   dosen_id uuid REFERENCES public.dosen(id) ON DELETE CASCADE NOT NULL,
   nama_kelas text NOT NULL,
-  kapasitas integer NOT NULL
+  kapasitas integer NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 -- 8. Create JADWAL table
@@ -106,7 +110,9 @@ CREATE TABLE IF NOT EXISTS public.krs (
   tanggal_pengajuan timestamp with time zone,
   disetujui_oleh uuid REFERENCES public.dosen(id) ON DELETE SET NULL,
   catatan_dosen_pa text,
-  UNIQUE (mahasiswa_id, semester_id)
+  UNIQUE (mahasiswa_id, semester_id),
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 -- 10. Create KRS DETAIL table

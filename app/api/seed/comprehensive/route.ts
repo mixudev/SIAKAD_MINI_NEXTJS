@@ -3,71 +3,71 @@ import { NextResponse } from 'next/server'
 
 const PW = 'password'
 
-function uid(seg: string, n: number): string {
-  return `${seg}0000000-0000-0000-0000-${n.toString().padStart(12, '0')}`
+function uid(type: string, seq: number): string {
+  return `${type}000000-0000-0000-0000-${seq.toString().padStart(12, '0')}`
 }
 
 // ── Master Data ──
 const PRODI = [
-  { id: uid('a', 1), nama: 'Teknik Informatika', kode: 'TI' },
-  { id: uid('a', 2), nama: 'Sistem Informasi', kode: 'SI' },
-  { id: uid('a', 3), nama: 'Manajemen Bisnis', kode: 'MB' },
+  { id: uid('a0', 1), nama: 'Teknik Informatika', kode: 'TI' },
+  { id: uid('a0', 2), nama: 'Sistem Informasi', kode: 'SI' },
+  { id: uid('a0', 3), nama: 'Manajemen Bisnis', kode: 'MB' },
 ]
 
 const SEMESTER = [
-  { id: uid('b', 1), nama: 'Ganjil 2024/2025', ta: '2024/2025', mulai: '2024-09-01', selesai: '2025-01-31', aktif: false },
-  { id: uid('b', 2), nama: 'Genap 2024/2025', ta: '2024/2025', mulai: '2025-02-01', selesai: '2025-06-30', aktif: false },
-  { id: uid('b', 3), nama: 'Ganjil 2025/2026', ta: '2025/2026', mulai: '2025-09-01', selesai: '2026-01-31', aktif: true },
+  { id: uid('a1', 1), nama: 'Ganjil 2024/2025', ta: '2024/2025', mulai: '2024-09-01', selesai: '2025-01-31', aktif: false },
+  { id: uid('a1', 2), nama: 'Genap 2024/2025', ta: '2024/2025', mulai: '2025-02-01', selesai: '2025-06-30', aktif: false },
+  { id: uid('a1', 3), nama: 'Ganjil 2025/2026', ta: '2025/2026', mulai: '2025-09-01', selesai: '2026-01-31', aktif: true },
 ]
 
 const AUTH_USERS = [
-  { id: uid('c', 1), username: 'admin.siakad', role: 'admin', nama: 'Administrator SIAKAD' },
-  { id: uid('c', 2), username: '0123456789', role: 'dosen', nama: 'Dr. Budi Santoso, M.Kom' },
-  { id: uid('c', 3), username: '2021310045', role: 'mahasiswa', nama: 'Rina Aulia Putri' },
-  { id: uid('c', 4), username: '9876543210', role: 'dosen', nama: 'Dra. Siti Rahmawati, M.Pd' },
-  { id: uid('c', 5), username: '1111111111', role: 'dosen', nama: 'Hendra Gunawan, S.Kom, M.Kom' },
-  { id: uid('c', 6), username: '2222222222', role: 'dosen', nama: 'Dr. Dewi Sartika, M.Si' },
-  { id: uid('c', 7), username: '3333333333', role: 'dosen', nama: 'Ahmad Fauzi, S.Si, M.T' },
-  { id: uid('c', 8), username: '2021310050', role: 'mahasiswa', nama: 'Dimas Ardiansyah' },
-  { id: uid('c', 9), username: '2022310010', role: 'mahasiswa', nama: 'Sarah Annisa' },
-  { id: uid('c', 10), username: '2022310015', role: 'mahasiswa', nama: 'Budi Prasetyo' },
-  { id: uid('c', 11), username: '2023310001', role: 'mahasiswa', nama: 'Citra Lestari' },
+  { id: uid('a2', 1), username: 'admin.siakad', role: 'admin', nama: 'Administrator SIAKAD' },
+  { id: uid('a2', 2), username: '0123456789', role: 'dosen', nama: 'Dr. Budi Santoso, M.Kom' },
+  { id: uid('a2', 3), username: '2021310045', role: 'mahasiswa', nama: 'Rina Aulia Putri' },
+  { id: uid('a2', 4), username: '9876543210', role: 'dosen', nama: 'Dra. Siti Rahmawati, M.Pd' },
+  { id: uid('a2', 5), username: '1111111111', role: 'dosen', nama: 'Hendra Gunawan, S.Kom, M.Kom' },
+  { id: uid('a2', 6), username: '2222222222', role: 'dosen', nama: 'Dr. Dewi Sartika, M.Si' },
+  { id: uid('a2', 7), username: '3333333333', role: 'dosen', nama: 'Ahmad Fauzi, S.Si, M.T' },
+  { id: uid('a2', 8), username: '2021310050', role: 'mahasiswa', nama: 'Dimas Ardiansyah' },
+  { id: uid('a2', 9), username: '2022310010', role: 'mahasiswa', nama: 'Sarah Annisa' },
+  { id: uid('a2', 10), username: '2022310015', role: 'mahasiswa', nama: 'Budi Prasetyo' },
+  { id: uid('a2', 11), username: '2023310001', role: 'mahasiswa', nama: 'Citra Lestari' },
 ]
 
 const DOSEN = [
-  { id: uid('d', 1), nidn: '0123456789', nama: 'Dr. Budi Santoso, M.Kom', prodi: uid('a', 1), jabatan: 'Lektor Kepala' },
-  { id: uid('d', 2), nidn: '9876543210', nama: 'Dra. Siti Rahmawati, M.Pd', prodi: uid('a', 2), jabatan: 'Lektor' },
-  { id: uid('d', 3), nidn: '1111111111', nama: 'Hendra Gunawan, S.Kom, M.Kom', prodi: uid('a', 1), jabatan: 'Asisten Ahli' },
-  { id: uid('d', 4), nidn: '2222222222', nama: 'Dr. Dewi Sartika, M.Si', prodi: uid('a', 3), jabatan: 'Lektor Kepala' },
-  { id: uid('d', 5), nidn: '3333333333', nama: 'Ahmad Fauzi, S.Si, M.T', prodi: uid('a', 2), jabatan: 'Lektor' },
+  { id: uid('a3', 1), nidn: '0123456789', nama: 'Dr. Budi Santoso, M.Kom', prodi: uid('a0', 1), jabatan: 'Lektor Kepala' },
+  { id: uid('a3', 2), nidn: '9876543210', nama: 'Dra. Siti Rahmawati, M.Pd', prodi: uid('a0', 2), jabatan: 'Lektor' },
+  { id: uid('a3', 3), nidn: '1111111111', nama: 'Hendra Gunawan, S.Kom, M.Kom', prodi: uid('a0', 1), jabatan: 'Asisten Ahli' },
+  { id: uid('a3', 4), nidn: '2222222222', nama: 'Dr. Dewi Sartika, M.Si', prodi: uid('a0', 3), jabatan: 'Lektor Kepala' },
+  { id: uid('a3', 5), nidn: '3333333333', nama: 'Ahmad Fauzi, S.Si, M.T', prodi: uid('a0', 2), jabatan: 'Lektor' },
 ]
 
 const MHS = [
-  { id: uid('e', 1), nim: '2021310045', nama: 'Rina Aulia Putri', prodi: uid('a', 1), angkatan: 2021, pa: uid('d', 1) },
-  { id: uid('e', 2), nim: '2021310050', nama: 'Dimas Ardiansyah', prodi: uid('a', 1), angkatan: 2021, pa: uid('d', 1) },
-  { id: uid('e', 3), nim: '2022310010', nama: 'Sarah Annisa', prodi: uid('a', 2), angkatan: 2022, pa: uid('d', 2) },
-  { id: uid('e', 4), nim: '2022310015', nama: 'Budi Prasetyo', prodi: uid('a', 3), angkatan: 2022, pa: uid('d', 4) },
-  { id: uid('e', 5), nim: '2023310001', nama: 'Citra Lestari', prodi: uid('a', 2), angkatan: 2023, pa: uid('d', 5) },
+  { id: uid('a4', 1), nim: '2021310045', nama: 'Rina Aulia Putri', prodi: uid('a0', 1), angkatan: 2021, pa: uid('a3', 1) },
+  { id: uid('a4', 2), nim: '2021310050', nama: 'Dimas Ardiansyah', prodi: uid('a0', 1), angkatan: 2021, pa: uid('a3', 1) },
+  { id: uid('a4', 3), nim: '2022310010', nama: 'Sarah Annisa', prodi: uid('a0', 2), angkatan: 2022, pa: uid('a3', 2) },
+  { id: uid('a4', 4), nim: '2022310015', nama: 'Budi Prasetyo', prodi: uid('a0', 3), angkatan: 2022, pa: uid('a3', 4) },
+  { id: uid('a4', 5), nim: '2023310001', nama: 'Citra Lestari', prodi: uid('a0', 2), angkatan: 2023, pa: uid('a3', 5) },
 ]
 
 // [id, kode, nama, sks, prodi_id, semester_ke]
 const MATKUL = [
-  [uid('f', 1), 'TI101', 'Matematika Diskrit', 3, uid('a', 1), 1],
-  [uid('f', 2), 'TI102', 'Algoritma & Pemrograman', 4, uid('a', 1), 1],
-  [uid('f', 3), 'TI103', 'Basis Data', 3, uid('a', 1), 2],
-  [uid('f', 4), 'TI104', 'Struktur Data', 3, uid('a', 1), 2],
-  [uid('f', 5), 'TI105', 'Jaringan Komputer', 3, uid('a', 1), 3],
-  [uid('f', 6), 'TI106', 'Sistem Operasi', 3, uid('a', 1), 3],
-  [uid('f', 7), 'TI107', 'Rekayasa Perangkat Lunak', 3, uid('a', 1), 4],
-  [uid('f', 8), 'TI108', 'Kecerdasan Buatan', 3, uid('a', 1), 5],
-  [uid('f', 9), 'SI101', 'Pengantar Sistem Informasi', 3, uid('a', 2), 1],
-  [uid('f', 10), 'SI102', 'Pemrograman Web', 4, uid('a', 2), 2],
-  [uid('f', 11), 'SI103', 'Analisis Proses Bisnis', 3, uid('a', 2), 3],
-  [uid('f', 12), 'SI104', 'Manajemen Proyek SI', 3, uid('a', 2), 4],
-  [uid('f', 13), 'MB101', 'Pengantar Manajemen', 3, uid('a', 3), 1],
-  [uid('f', 14), 'MB102', 'Akuntansi Dasar', 3, uid('a', 3), 2],
-  [uid('f', 15), 'MB103', 'Manajemen Keuangan', 3, uid('a', 3), 3],
-  [uid('f', 16), 'MB104', 'Perilaku Organisasi', 3, uid('a', 3), 4],
+  [uid('a5', 1), 'TI101', 'Matematika Diskrit', 3, uid('a0', 1), 1],
+  [uid('a5', 2), 'TI102', 'Algoritma & Pemrograman', 4, uid('a0', 1), 1],
+  [uid('a5', 3), 'TI103', 'Basis Data', 3, uid('a0', 1), 2],
+  [uid('a5', 4), 'TI104', 'Struktur Data', 3, uid('a0', 1), 2],
+  [uid('a5', 5), 'TI105', 'Jaringan Komputer', 3, uid('a0', 1), 3],
+  [uid('a5', 6), 'TI106', 'Sistem Operasi', 3, uid('a0', 1), 3],
+  [uid('a5', 7), 'TI107', 'Rekayasa Perangkat Lunak', 3, uid('a0', 1), 4],
+  [uid('a5', 8), 'TI108', 'Kecerdasan Buatan', 3, uid('a0', 1), 5],
+  [uid('a5', 9), 'SI101', 'Pengantar Sistem Informasi', 3, uid('a0', 2), 1],
+  [uid('a5', 10), 'SI102', 'Pemrograman Web', 4, uid('a0', 2), 2],
+  [uid('a5', 11), 'SI103', 'Analisis Proses Bisnis', 3, uid('a0', 2), 3],
+  [uid('a5', 12), 'SI104', 'Manajemen Proyek SI', 3, uid('a0', 2), 4],
+  [uid('a5', 13), 'MB101', 'Pengantar Manajemen', 3, uid('a0', 3), 1],
+  [uid('a5', 14), 'MB102', 'Akuntansi Dasar', 3, uid('a0', 3), 2],
+  [uid('a5', 15), 'MB103', 'Manajemen Keuangan', 3, uid('a0', 3), 3],
+  [uid('a5', 16), 'MB104', 'Perilaku Organisasi', 3, uid('a0', 3), 4],
 ]
 
 // Pretty names for mata kuliah
@@ -75,43 +75,43 @@ const MK_NAMES = Object.fromEntries(MATKUL.map(m => [m[0] as string, m[1] as str
 
 // Prerequisites [matkul_id, prereq_id]
 const PREREQ = [
-  [uid('f', 3), uid('f', 2)],  // Basis Data ← Algoritma
-  [uid('f', 4), uid('f', 2)],  // Struktur Data ← Algoritma
-  [uid('f', 5), uid('f', 3)],  // Jarkom ← Basis Data
-  [uid('f', 7), uid('f', 4)],  // RPL ← Struktur Data
-  [uid('f', 8), uid('f', 5)],  // AI ← Jarkom
-  [uid('f', 8), uid('f', 4)],  // AI ← Struktur Data
-  [uid('f', 11), uid('f', 9)], // Analisis Bisnis ← Pengantar SI
-  [uid('f', 15), uid('f', 14)],// Manajemen Keuangan ← Akuntansi
+  [uid('a5', 3), uid('a5', 2)],  // Basis Data ← Algoritma
+  [uid('a5', 4), uid('a5', 2)],  // Struktur Data ← Algoritma
+  [uid('a5', 5), uid('a5', 3)],  // Jarkom ← Basis Data
+  [uid('a5', 7), uid('a5', 4)],  // RPL ← Struktur Data
+  [uid('a5', 8), uid('a5', 5)],  // AI ← Jarkom
+  [uid('a5', 8), uid('a5', 4)],  // AI ← Struktur Data
+  [uid('a5', 11), uid('a5', 9)], // Analisis Bisnis ← Pengantar SI
+  [uid('a5', 15), uid('a5', 14)],// Manajemen Keuangan ← Akuntansi
 ]
 
 // ── Kelas per semester ──
 // Smt 1 (Ganjil 2024/25): 4 kelas
 const SMT1_KLS = [
-  { id: uid('g', 1), matkul: uid('f', 1), dosen: uid('d', 1), nama: 'A', kap: 40 },
-  { id: uid('g', 2), matkul: uid('f', 2), dosen: uid('d', 3), nama: 'A', kap: 40 },
-  { id: uid('g', 3), matkul: uid('f', 9), dosen: uid('d', 2), nama: 'A', kap: 40 },
-  { id: uid('g', 4), matkul: uid('f', 13), dosen: uid('d', 4), nama: 'A', kap: 40 },
+  { id: uid('a6', 1), matkul: uid('a5', 1), dosen: uid('a3', 1), nama: 'A', kap: 40 },
+  { id: uid('a6', 2), matkul: uid('a5', 2), dosen: uid('a3', 3), nama: 'A', kap: 40 },
+  { id: uid('a6', 3), matkul: uid('a5', 9), dosen: uid('a3', 2), nama: 'A', kap: 40 },
+  { id: uid('a6', 4), matkul: uid('a5', 13), dosen: uid('a3', 4), nama: 'A', kap: 40 },
 ]
 
 // Smt 2 (Genap 2024/25): 4 kelas
 const SMT2_KLS = [
-  { id: uid('g', 5), matkul: uid('f', 3), dosen: uid('d', 1), nama: 'A', kap: 40 },
-  { id: uid('g', 6), matkul: uid('f', 4), dosen: uid('d', 3), nama: 'A', kap: 40 },
-  { id: uid('g', 7), matkul: uid('f', 10), dosen: uid('d', 5), nama: 'A', kap: 40 },
-  { id: uid('g', 8), matkul: uid('f', 14), dosen: uid('d', 4), nama: 'A', kap: 40 },
+  { id: uid('a6', 5), matkul: uid('a5', 3), dosen: uid('a3', 1), nama: 'A', kap: 40 },
+  { id: uid('a6', 6), matkul: uid('a5', 4), dosen: uid('a3', 3), nama: 'A', kap: 40 },
+  { id: uid('a6', 7), matkul: uid('a5', 10), dosen: uid('a3', 5), nama: 'A', kap: 40 },
+  { id: uid('a6', 8), matkul: uid('a5', 14), dosen: uid('a3', 4), nama: 'A', kap: 40 },
 ]
 
 // Smt 3 (Ganjil 2025/26 - active): 8 kelas
 const SMT3_KLS = [
-  { id: uid('g', 9), matkul: uid('f', 5), dosen: uid('d', 1), nama: 'A', kap: 40 },
-  { id: uid('g', 10), matkul: uid('f', 6), dosen: uid('d', 3), nama: 'A', kap: 40 },
-  { id: uid('g', 11), matkul: uid('f', 7), dosen: uid('d', 3), nama: 'A', kap: 40 },
-  { id: uid('g', 12), matkul: uid('f', 8), dosen: uid('d', 1), nama: 'A', kap: 40 },
-  { id: uid('g', 13), matkul: uid('f', 11), dosen: uid('d', 2), nama: 'A', kap: 40 },
-  { id: uid('g', 14), matkul: uid('f', 12), dosen: uid('d', 5), nama: 'A', kap: 40 },
-  { id: uid('g', 15), matkul: uid('f', 15), dosen: uid('d', 4), nama: 'A', kap: 40 },
-  { id: uid('g', 16), matkul: uid('f', 16), dosen: uid('d', 4), nama: 'A', kap: 40 },
+  { id: uid('a6', 9), matkul: uid('a5', 5), dosen: uid('a3', 1), nama: 'A', kap: 40 },
+  { id: uid('a6', 10), matkul: uid('a5', 6), dosen: uid('a3', 3), nama: 'A', kap: 40 },
+  { id: uid('a6', 11), matkul: uid('a5', 7), dosen: uid('a3', 3), nama: 'A', kap: 40 },
+  { id: uid('a6', 12), matkul: uid('a5', 8), dosen: uid('a3', 1), nama: 'A', kap: 40 },
+  { id: uid('a6', 13), matkul: uid('a5', 11), dosen: uid('a3', 2), nama: 'A', kap: 40 },
+  { id: uid('a6', 14), matkul: uid('a5', 12), dosen: uid('a3', 5), nama: 'A', kap: 40 },
+  { id: uid('a6', 15), matkul: uid('a5', 15), dosen: uid('a3', 4), nama: 'A', kap: 40 },
+  { id: uid('a6', 16), matkul: uid('a5', 16), dosen: uid('a3', 4), nama: 'A', kap: 40 },
 ]
 
 const ALL_KELAS = [...SMT1_KLS, ...SMT2_KLS, ...SMT3_KLS]
@@ -119,9 +119,9 @@ const ALL_KELAS = [...SMT1_KLS, ...SMT2_KLS, ...SMT3_KLS]
 // helper: find semester ID for a class
 function semesterOfKelas(kelasId: string): string {
   const n = parseInt(kelasId.slice(-12))
-  if (n <= 4) return uid('b', 1)
-  if (n <= 8) return uid('b', 2)
-  return uid('b', 3)
+  if (n <= 4) return uid('a1', 1)
+  if (n <= 8) return uid('a1', 2)
+  return uid('a1', 3)
 }
 
 const JADWAL = [
@@ -167,7 +167,7 @@ function genPertemuan(kelasId: string, namaMatkul: string, startDate: string, of
     const d = new Date(startDate)
     d.setDate(d.getDate() + i * 7)
     result.push({
-      id: uid('k', offset + i + 1),
+      id: uid('b0', offset + i + 1),
       kelas_id: kelasId,
       pertemuan_ke: i + 1,
       tanggal: d.toISOString().split('T')[0],
@@ -206,10 +206,14 @@ export async function GET() {
     })), 'kode_matkul')
     log.push(`✅ ${MATKUL.length} mata kuliah`)
 
-    await batchedUpsert(admin, 'mata_kuliah_prerequisite', PREREQ.map((p, i) => ({
-      id: uid('o', i + 1), mata_kuliah_id: p[0], prerequisite_id: p[1],
-    })))
-    log.push(`✅ ${PREREQ.length} prerequisites`)
+    try {
+      await batchedUpsert(admin, 'mata_kuliah_prerequisite', PREREQ.map((p, i) => ({
+        id: uid('b4', i + 1), mata_kuliah_id: p[0], prerequisite_id: p[1],
+      })))
+      log.push(`✅ ${PREREQ.length} prerequisites`)
+    } catch {
+      log.push(`⚠️  prerequisites skipped (table mata_kuliah_prerequisite belum ada)`)
+    }
 
     // 2. Auth users
     const userIdMap = new Map<string, string>()
@@ -282,7 +286,7 @@ export async function GET() {
 
     // 4. Jadwal
     await batchedUpsert(admin, 'jadwal', ALL_KELAS.map((k, i) => ({
-      id: uid('h', i + 1),
+      id: uid('a7', i + 1),
       kelas_id: k.id,
       hari: JADWAL[i].hari,
       jam_mulai: JADWAL[i].mulai,
@@ -295,8 +299,8 @@ export async function GET() {
     const allPertemuan: Record<string, unknown>[] = []
     let pOffset = 0
     for (const k of ALL_KELAS) {
-      const startDate = semesterOfKelas(k.id) === uid('b', 1) ? '2024-09-02'
-        : semesterOfKelas(k.id) === uid('b', 2) ? '2025-02-03' : '2025-09-01'
+      const startDate = semesterOfKelas(k.id) === uid('a1', 1) ? '2024-09-02'
+        : semesterOfKelas(k.id) === uid('a1', 2) ? '2025-02-03' : '2025-09-01'
       const matkulName = MK_NAMES[k.matkul] || ''
       const pert = genPertemuan(k.id, matkulName, startDate, pOffset)
       allPertemuan.push(...pert)
@@ -309,9 +313,9 @@ export async function GET() {
     const allKomp: Record<string, unknown>[] = []
     for (let i = 0; i < ALL_KELAS.length; i++) {
       const base = i * 3
-      allKomp.push({ id: uid('l', base + 1), kelas_id: ALL_KELAS[i].id, nama_komponen: 'Tugas', bobot_persen: 30 })
-      allKomp.push({ id: uid('l', base + 2), kelas_id: ALL_KELAS[i].id, nama_komponen: 'UTS', bobot_persen: 35 })
-      allKomp.push({ id: uid('l', base + 3), kelas_id: ALL_KELAS[i].id, nama_komponen: 'UAS', bobot_persen: 35 })
+      allKomp.push({ id: uid('b1', base + 1), kelas_id: ALL_KELAS[i].id, nama_komponen: 'Tugas', bobot_persen: 30 })
+      allKomp.push({ id: uid('b1', base + 2), kelas_id: ALL_KELAS[i].id, nama_komponen: 'UTS', bobot_persen: 35 })
+      allKomp.push({ id: uid('b1', base + 3), kelas_id: ALL_KELAS[i].id, nama_komponen: 'UAS', bobot_persen: 35 })
     }
     await batchedUpsert(admin, 'komponen_nilai', allKomp)
     log.push(`✅ ${allKomp.length} komponen nilai`)
@@ -321,9 +325,9 @@ export async function GET() {
     for (let i = 0; i < ALL_KELAS.length; i++) {
       const base = i * 3
       kompMap.set(ALL_KELAS[i].id, {
-        tugas: uid('l', base + 1),
-        uts: uid('l', base + 2),
-        uas: uid('l', base + 3),
+        tugas: uid('b1', base + 1),
+        uts: uid('b1', base + 2),
+        uas: uid('b1', base + 3),
       })
     }
 
@@ -340,13 +344,13 @@ export async function GET() {
     // [mhsId, smt, kelasIndices [], nilai [{tugas, uts, uas} per kelas]]
     type PastEnr = [string, number, number[], { tugas: number; uts: number; uas: number }[]]
     const PAST: PastEnr[] = [
-      [uid('e', 1), 1, [0, 1], [{ tugas: 90, uts: 88, uas: 92 }, { tugas: 85, uts: 82, uas: 87 }]], // Rina smt1
-      [uid('e', 1), 2, [4, 5], [{ tugas: 88, uts: 90, uas: 86 }, { tugas: 80, uts: 78, uas: 85 }]], // Rina smt2
-      [uid('e', 2), 1, [0, 1], [{ tugas: 72, uts: 68, uas: 75 }, { tugas: 65, uts: 70, uas: 68 }]], // Dimas smt1
-      [uid('e', 2), 2, [4, 5], [{ tugas: 60, uts: 55, uas: 65 }, { tugas: 75, uts: 70, uas: 72 }]], // Dimas smt2
-      [uid('e', 3), 1, [2], [{ tugas: 88, uts: 92, uas: 90 }]], // Sarah smt1
-      [uid('e', 3), 2, [6], [{ tugas: 90, uts: 85, uas: 88 }]], // Sarah smt2
-      [uid('e', 4), 1, [3], [{ tugas: 60, uts: 55, uas: 58 }]], // BudiP smt1
+      [uid('a4', 1), 1, [0, 1], [{ tugas: 90, uts: 88, uas: 92 }, { tugas: 85, uts: 82, uas: 87 }]], // Rina smt1
+      [uid('a4', 1), 2, [4, 5], [{ tugas: 88, uts: 90, uas: 86 }, { tugas: 80, uts: 78, uas: 85 }]], // Rina smt2
+      [uid('a4', 2), 1, [0, 1], [{ tugas: 72, uts: 68, uas: 75 }, { tugas: 65, uts: 70, uas: 68 }]], // Dimas smt1
+      [uid('a4', 2), 2, [4, 5], [{ tugas: 60, uts: 55, uas: 65 }, { tugas: 75, uts: 70, uas: 72 }]], // Dimas smt2
+      [uid('a4', 3), 1, [2], [{ tugas: 88, uts: 92, uas: 90 }]], // Sarah smt1
+      [uid('a4', 3), 2, [6], [{ tugas: 90, uts: 85, uas: 88 }]], // Sarah smt2
+      [uid('a4', 4), 1, [3], [{ tugas: 60, uts: 55, uas: 58 }]], // BudiP smt1
     ]
 
     let krsSeq = 0
@@ -358,25 +362,26 @@ export async function GET() {
 
     for (const [mhsId, smt, kIndices, nilaiArr] of PAST) {
       krsSeq++
-      const krsSemester = smt === 1 ? uid('b', 1) : uid('b', 2)
+      const krsSemester = smt === 1 ? uid('a1', 1) : uid('a1', 2)
+      const offset = smt === 1 ? 0 : SMT1_KLS.length
       const kelasLst = smt === 1 ? SMT1_KLS : SMT2_KLS
 
       await batchedUpsert(admin, 'krs', [{
-        id: uid('i', krsSeq),
+        id: uid('a8', krsSeq),
         mahasiswa_id: mhsId,
         semester_id: krsSemester,
         status: 'disetujui',
         tanggal_pengajuan: '2024-09-01T00:00:00Z',
-        disetujui_oleh: uid('d', 1),
+        disetujui_oleh: uid('a3', 1),
       }])
 
       const details: Record<string, unknown>[] = []
       for (const ki of kIndices) {
         detailSeq++
         details.push({
-          id: uid('j', detailSeq),
-          krs_id: uid('i', krsSeq),
-          kelas_id: kelasLst[ki].id,
+          id: uid('a9', detailSeq),
+          krs_id: uid('a8', krsSeq),
+          kelas_id: kelasLst[ki - offset].id,
         })
       }
       await batchedUpsert(admin, 'krs_detail', details)
@@ -384,21 +389,21 @@ export async function GET() {
       // Nilai per komponen
       for (let vi = 0; vi < nilaiArr.length; vi++) {
         const kid = kIndices[vi]
-        const kId = kelasLst[kid].id
+        const kId = kelasLst[kid - offset].id
         const komp = kompMap.get(kId)!
         const n = nilaiArr[vi]
         const score = Math.round((n.tugas * 0.3 + n.uts * 0.35 + n.uas * 0.35) * 10) / 10
 
         nSeq++
-        allNilai.push({ id: uid('m', nSeq), komponen_nilai_id: komp.tugas, mahasiswa_id: mhsId, nilai_angka: n.tugas })
+        allNilai.push({ id: uid('b2', nSeq), komponen_nilai_id: komp.tugas, mahasiswa_id: mhsId, nilai_angka: n.tugas })
         nSeq++
-        allNilai.push({ id: uid('m', nSeq), komponen_nilai_id: komp.uts, mahasiswa_id: mhsId, nilai_angka: n.uts })
+        allNilai.push({ id: uid('b2', nSeq), komponen_nilai_id: komp.uts, mahasiswa_id: mhsId, nilai_angka: n.uts })
         nSeq++
-        allNilai.push({ id: uid('m', nSeq), komponen_nilai_id: komp.uas, mahasiswa_id: mhsId, nilai_angka: n.uas })
+        allNilai.push({ id: uid('b2', nSeq), komponen_nilai_id: komp.uas, mahasiswa_id: mhsId, nilai_angka: n.uas })
 
         naSeq++
         allNA.push({
-          id: uid('n', naSeq),
+          id: uid('b3', naSeq),
           mahasiswa_id: mhsId,
           kelas_id: kId,
           nilai_angka_akhir: score,
@@ -416,30 +421,30 @@ export async function GET() {
     // ──────────────────────────────────────────────
     type ActiveEnr = [string, number[], string] // [mhsId, kelasIndices[], status]
     const ACTIVE: ActiveEnr[] = [
-      [uid('e', 1), [8, 9, 10, 11], 'disetujui'],  // Rina: MK005,006,007,008
-      [uid('e', 2), [8, 9, 10], 'diajukan'],         // Dimas: MK005,006,007
-      [uid('e', 3), [12, 13], 'disetujui'],          // Sarah: SI103, SI104
-      [uid('e', 4), [14, 15], 'draft'],              // BudiP: MB103, MB104
-      [uid('e', 5), [12, 13], 'diajukan'],           // Citra: SI103, SI104
+      [uid('a4', 1), [8, 9, 10, 11], 'disetujui'],  // Rina: MK005,006,007,008
+      [uid('a4', 2), [8, 9, 10], 'diajukan'],         // Dimas: MK005,006,007
+      [uid('a4', 3), [12, 13], 'disetujui'],          // Sarah: SI103, SI104
+      [uid('a4', 4), [14, 15], 'draft'],              // BudiP: MB103, MB104
+      [uid('a4', 5), [12, 13], 'diajukan'],           // Citra: SI103, SI104
     ]
 
     for (const [mhsId, kIndices, status] of ACTIVE) {
       krsSeq++
       await batchedUpsert(admin, 'krs', [{
-        id: uid('i', krsSeq),
+        id: uid('a8', krsSeq),
         mahasiswa_id: mhsId,
-        semester_id: uid('b', 3),
+        semester_id: uid('a1', 3),
         status,
         tanggal_pengajuan: status !== 'draft' ? '2025-09-10T00:00:00Z' : null,
-        disetujui_oleh: status === 'disetujui' ? uid('d', 1) : null,
+        disetujui_oleh: status === 'disetujui' ? uid('a3', 1) : null,
       }])
 
       const details: Record<string, unknown>[] = []
       for (const ki of kIndices) {
         detailSeq++
         details.push({
-          id: uid('j', detailSeq),
-          krs_id: uid('i', krsSeq),
+          id: uid('a9', detailSeq),
+          krs_id: uid('a8', krsSeq),
           kelas_id: SMT3_KLS[ki - 8].id, // indices 0-based in SMT3_KLS
         })
       }
@@ -464,11 +469,11 @@ export async function GET() {
     const ATT_M = ['hadir','hadir','izin','hadir','alpa','hadir','hadir','izin','hadir','alpa','hadir','hadir','izin','hadir']
 
     const attMap = new Map<string, string[]>()
-    attMap.set(uid('e', 1), ATT_G) // Rina
-    attMap.set(uid('e', 2), ATT_B) // Dimas
-    attMap.set(uid('e', 3), ATT_G) // Sarah
-    attMap.set(uid('e', 4), ATT_M) // BudiP
-    attMap.set(uid('e', 5), ATT_G) // Citra
+    attMap.set(uid('a4', 1), ATT_G) // Rina
+    attMap.set(uid('a4', 2), ATT_B) // Dimas
+    attMap.set(uid('a4', 3), ATT_G) // Sarah
+    attMap.set(uid('a4', 4), ATT_M) // BudiP
+    attMap.set(uid('a4', 5), ATT_G) // Citra
 
     const allAbsensi: Record<string, unknown>[] = []
     let absSeq = 0
@@ -481,7 +486,7 @@ export async function GET() {
         for (let pi = 0; pi < pertIds.length; pi++) {
           absSeq++
           allAbsensi.push({
-            id: uid('p', absSeq),
+            id: uid('b5', absSeq),
             pertemuan_id: pertIds[pi],
             mahasiswa_id: mhsId,
             status: pattern[pi] || 'hadir',

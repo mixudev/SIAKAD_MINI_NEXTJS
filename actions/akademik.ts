@@ -2,6 +2,8 @@
 
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
+import { semesterSchema, prodiSchema, matkulSchema, kelasSchema, jadwalSchema } from '@/lib/validations/akademik'
+import { getCurrentUser, isAuthorized } from '@/lib/auth-utils'
 
 const getAdminClient = () => {
   return createSupabaseClient(
@@ -21,7 +23,6 @@ export async function getSemestersAction() {
       .from('semester')
       .select('*')
       .order('tahun_akademik', { ascending: false })
-      .order('created_at', { ascending: false })
     if (error) throw error
     return { success: true, data: data || [] }
   } catch (err: unknown) {
@@ -52,6 +53,16 @@ export async function createSemesterAction(data: {
   tanggal_mulai: string
   tanggal_selesai: string
 }) {
+  const parsed = semesterSchema.safeParse(data)
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') }
+  }
+
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized: hanya admin yang dapat melakukan aksi ini' }
+  }
+
   const adminClient = getAdminClient()
   try {
     const { error } = await adminClient.from('semester').insert({
@@ -71,6 +82,11 @@ export async function createSemesterAction(data: {
 }
 
 export async function activateSemesterAction(id: string) {
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
   try {
     const { error: deactivateError } = await adminClient
@@ -94,6 +110,11 @@ export async function activateSemesterAction(id: string) {
 }
 
 export async function deleteSemesterAction(id: string) {
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
   try {
     const { error } = await adminClient.from('semester').delete().eq('id', id)
@@ -126,6 +147,16 @@ export async function getProdiAction() {
 }
 
 export async function createProdiAction(data: { nama: string; kode: string }) {
+  const parsed = prodiSchema.safeParse(data)
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') }
+  }
+
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
   try {
     const { error } = await adminClient.from('program_studi').insert({
@@ -142,6 +173,11 @@ export async function createProdiAction(data: { nama: string; kode: string }) {
 }
 
 export async function updateProdiAction(id: string, data: { nama: string; kode: string }) {
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
   try {
     const { error } = await adminClient
@@ -158,6 +194,11 @@ export async function updateProdiAction(id: string, data: { nama: string; kode: 
 }
 
 export async function deleteProdiAction(id: string) {
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
   try {
     const { error } = await adminClient.from('program_studi').delete().eq('id', id)
@@ -217,6 +258,16 @@ export async function createMatkulAction(data: {
   program_studi_id: string
   semester_ke: number
 }) {
+  const parsed = matkulSchema.safeParse(data)
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') }
+  }
+
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
   try {
     const { error } = await adminClient.from('mata_kuliah').insert({
@@ -250,6 +301,16 @@ export async function updateMatkulAction(
     semester_ke: number
   }
 ) {
+  const parsed = matkulSchema.safeParse(data)
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') }
+  }
+
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
   try {
     const { error } = await adminClient
@@ -271,6 +332,11 @@ export async function updateMatkulAction(
 }
 
 export async function deleteMatkulAction(id: string) {
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
   try {
     const { error } = await adminClient.from('mata_kuliah').delete().eq('id', id)
@@ -316,7 +382,7 @@ export async function getKelasAction(params: {
     const to = from + limit - 1
 
     const { data, count, error } = await query
-      .order('created_at', { ascending: false })
+      .order('nama_kelas', { ascending: true })
       .range(from, to)
 
     if (error) throw error
@@ -334,6 +400,16 @@ export async function createKelasAction(data: {
   kapasitas: number
   semester_id: string
 }) {
+  const parsed = kelasSchema.safeParse(data)
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') }
+  }
+
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
   try {
     const { error } = await adminClient.from('kelas').insert(data)
@@ -361,6 +437,16 @@ export async function updateKelasAction(
     semester_id: string
   }
 ) {
+  const parsed = kelasSchema.safeParse(data)
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') }
+  }
+
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
   try {
     const { error } = await adminClient
@@ -377,6 +463,11 @@ export async function updateKelasAction(
 }
 
 export async function deleteKelasAction(id: string) {
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
   try {
     const { error } = await adminClient.from('kelas').delete().eq('id', id)
@@ -422,7 +513,7 @@ export async function getAllKelasForJadwalAction(search?: string) {
     }
 
     const { data, error } = await query
-      .order('created_at', { ascending: false })
+      .order('nama_kelas', { ascending: true })
       .limit(200)
 
     if (error) throw error
@@ -440,6 +531,16 @@ export async function upsertJadwalAction(data: {
   jam_selesai: string
   ruangan: string
 }) {
+  const parsed = jadwalSchema.safeParse(data)
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') }
+  }
+
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
   try {
     const { error } = await adminClient.from('jadwal').insert({
@@ -459,6 +560,11 @@ export async function upsertJadwalAction(data: {
 }
 
 export async function deleteJadwalAction(id: string) {
+  const user = await getCurrentUser()
+  if (!isAuthorized(user?.app_metadata?.role as string, ['admin'])) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const adminClient = getAdminClient()
   try {
     const { error } = await adminClient.from('jadwal').delete().eq('id', id)

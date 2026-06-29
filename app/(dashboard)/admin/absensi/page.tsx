@@ -138,7 +138,7 @@ export default function AdminAbsensiPage() {
                     <TableCell className="text-sm font-medium text-[#09090b]">{k.mata_kuliah?.nama || '—'}</TableCell>
                     <TableCell className="text-xs text-[#52525b]">{k.nama_kelas}</TableCell>
                     <TableCell className="text-xs text-[#52525b]">{k.dosen?.nama_lengkap || '—'}</TableCell>
-                    <TableCell className="text-xs text-[#52525b]">{k.mata_kuliah?.program_studi?.singkatan || '—'}</TableCell>
+                    <TableCell className="text-xs text-[#52525b]">{k.mata_kuliah?.program_studi?.kode || '—'}</TableCell>
                     <TableCell className="text-center text-sm font-semibold text-[#09090b]">{k.total_pertemuan}</TableCell>
                     <TableCell className="text-center text-sm font-semibold text-[#09090b]">{k.filled_pertemuan}</TableCell>
                     <TableCell className="text-center">

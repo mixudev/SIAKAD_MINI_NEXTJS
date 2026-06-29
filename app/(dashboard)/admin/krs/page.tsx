@@ -170,7 +170,7 @@ export default function AdminKrsPage() {
             const rows = data.filter(Boolean).map((item: any) => [
               item.mahasiswa?.nim || '',
               item.mahasiswa?.nama_lengkap || '',
-              item.mahasiswa?.program_studi?.singkatan || '',
+              item.mahasiswa?.program_studi?.kode || '',
               item.semester?.nama || '',
               String(item.total_kelas || 0),
               String(item.total_sks || 0),
@@ -219,7 +219,7 @@ export default function AdminKrsPage() {
                   <TableRow key={item.id} className="border-b border-[#ececee]">
                     <TableCell className="text-sm font-mono font-medium text-[#09090b]">{item.mahasiswa?.nim || '—'}</TableCell>
                     <TableCell className="text-sm font-medium text-[#09090b]">{item.mahasiswa?.nama_lengkap || '—'}</TableCell>
-                    <TableCell className="text-xs text-[#52525b]">{item.mahasiswa?.program_studi?.singkatan || '—'}</TableCell>
+                    <TableCell className="text-xs text-[#52525b]">{item.mahasiswa?.program_studi?.kode || '—'}</TableCell>
                     <TableCell className="text-xs text-[#52525b]">{item.semester?.nama || '—'}</TableCell>
                     <TableCell className="text-sm text-[#52525b]">{item.total_kelas || 0}</TableCell>
                     <TableCell className="text-sm text-[#52525b]">{item.total_sks || 0}</TableCell>

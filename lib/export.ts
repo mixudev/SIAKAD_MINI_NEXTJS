@@ -221,10 +221,9 @@ export function exportRekapAbsensiPdf(
       }
       doc.text(r.nim, colX[0], y)
       doc.text(r.nama.substring(0, 30), colX[1], y)
-      doc.text(`${r.persen}%`, colX[2], y)
-      doc.text(`${r.hadir}`, colX[3], y)
-      doc.text(`${r.izin}`, colX[4], y)
-      doc.text(`${r.sakit}`, colX[5], y)
+      doc.text(`${r.hadir}`, colX[2], y)
+      doc.text(`${r.izin}`, colX[3], y)
+      doc.text(`${r.sakit}`, colX[4], y)
       doc.text(`${r.alpa}`, colX[5], y)
       y += 6
     }
