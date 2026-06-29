@@ -188,7 +188,7 @@ export async function getMahasiswaForAbsensiAction(pertemuanId: string) {
     // Get enrolled mahasiswa from approved KRS
     const { data: enrolled } = await adminClient
       .from('krs_detail')
-      .select('*, krs!inner(mahasiswa_id), mahasiswa!inner(id, nim, nama_lengkap)')
+      .select('*, krs!inner(mahasiswa_id)')
       .eq('kelas_id', pertemuan.kelas_id)
       .eq('krs.status', 'disetujui')
 
