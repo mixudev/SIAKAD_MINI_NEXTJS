@@ -282,8 +282,6 @@ export async function toggleUserBanAction(userId: string, shouldBan: boolean) {
       if (error) throw error
     }
 
-    if (error) throw error
-
     return { success: true }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error'

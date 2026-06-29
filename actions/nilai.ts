@@ -123,7 +123,7 @@ export async function upsertKomponenNilaiAction(formData: FormData) {
 
     const parsed = komponenNilaiSchema.safeParse({ kelas_id: kelasId, nama_komponen: nama, bobot_persen: bobot })
     if (!parsed.success) {
-      return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') }
+      return { success: false, error: parsed.error.issues.map(e => e.message).join(', ') }
     }
 
     if (komponenId) {

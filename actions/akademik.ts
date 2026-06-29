@@ -55,7 +55,7 @@ export async function createSemesterAction(data: {
 }) {
   const parsed = semesterSchema.safeParse(data)
   if (!parsed.success) {
-    return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') }
+    return { success: false, error: parsed.error.issues.map(e => e.message).join(', ') }
   }
 
   const user = await getCurrentUser()
@@ -149,7 +149,7 @@ export async function getProdiAction() {
 export async function createProdiAction(data: { nama: string; kode: string }) {
   const parsed = prodiSchema.safeParse(data)
   if (!parsed.success) {
-    return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') }
+    return { success: false, error: parsed.error.issues.map(e => e.message).join(', ') }
   }
 
   const user = await getCurrentUser()
@@ -260,7 +260,7 @@ export async function createMatkulAction(data: {
 }) {
   const parsed = matkulSchema.safeParse(data)
   if (!parsed.success) {
-    return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') }
+    return { success: false, error: parsed.error.issues.map(e => e.message).join(', ') }
   }
 
   const user = await getCurrentUser()
@@ -303,7 +303,7 @@ export async function updateMatkulAction(
 ) {
   const parsed = matkulSchema.safeParse(data)
   if (!parsed.success) {
-    return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') }
+    return { success: false, error: parsed.error.issues.map(e => e.message).join(', ') }
   }
 
   const user = await getCurrentUser()
@@ -402,7 +402,7 @@ export async function createKelasAction(data: {
 }) {
   const parsed = kelasSchema.safeParse(data)
   if (!parsed.success) {
-    return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') }
+    return { success: false, error: parsed.error.issues.map(e => e.message).join(', ') }
   }
 
   const user = await getCurrentUser()
@@ -439,7 +439,7 @@ export async function updateKelasAction(
 ) {
   const parsed = kelasSchema.safeParse(data)
   if (!parsed.success) {
-    return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') }
+    return { success: false, error: parsed.error.issues.map(e => e.message).join(', ') }
   }
 
   const user = await getCurrentUser()
@@ -533,7 +533,7 @@ export async function upsertJadwalAction(data: {
 }) {
   const parsed = jadwalSchema.safeParse(data)
   if (!parsed.success) {
-    return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') }
+    return { success: false, error: parsed.error.issues.map(e => e.message).join(', ') }
   }
 
   const user = await getCurrentUser()
