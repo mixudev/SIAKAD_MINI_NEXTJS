@@ -532,7 +532,7 @@ export async function getKrsBimbinganAction() {
 
     const { data: mahasiswaList } = await adminClient
       .from('mahasiswa')
-      .select('id, nim, nama_lengkap, program_studi(kode, nama)')
+      .select('id, nim, nama_lengkap, angkatan, program_studi(kode, nama)')
       .eq('dosen_pa_id', dosen.id)
       .order('nim', { ascending: true })
 
@@ -573,6 +573,7 @@ export async function getKrsBimbinganAction() {
         id: krs?.id || null,
         nim: m.nim,
         nama_lengkap: m.nama_lengkap,
+        angkatan: m.angkatan,
         program_studi: m.program_studi,
         status: krs?.status || null,
         tanggal_pengajuan: krs?.tanggal_pengajuan || null,
@@ -771,7 +772,7 @@ export async function getAllKrsAdminAction(params: {
 
     let query = adminClient
       .from('krs')
-      .select('*, mahasiswa!inner(nim, nama_lengkap, program_studi_id, program_studi(kode, nama), dosen_pa(nama_lengkap)), semester(nama, tahun_akademik)', { count: 'exact' })
+      .select('*, mahasiswa(nim, nama_lengkap, angkatan, program_studi_id, program_studi(kode, nama), dosen_pa(nama_lengkap)), semester(nama, tahun_akademik)', { count: 'exact' })
 
     if (semFilter) query = query.eq('semester_id', semFilter)
     if (status && status !== 'all') query = query.eq('status', status)
@@ -853,5 +854,23 @@ export async function getKrsAdminDetailAction(krsId: string) {
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     return { success: false, error: message }
+  }
+}
+
+// ============================================================
+// SEMESTER — GET ACTIVE
+// ============================================================
+
+export async function getActiveSemesterAction() {
+  const adminClient = getAdminClient()
+  try {
+    const { data } = await adminClient
+      .from('semester')
+      .select('nama, tahun_akademik')
+      .eq('is_active', true)
+      .maybeSingle()
+    return data || null
+  } catch {
+    return null
   }
 }

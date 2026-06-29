@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
+import { hitungSemesterMahasiswa } from '@/lib/semester-utils'
 import {
   BookOpen,
   Loader2,
@@ -104,7 +105,7 @@ export default function AdminKrsPage() {
   const handleApprove = () => {
     if (!detail) return
     startTransition(async () => {
-      const res = await approveKrsAction(detail.krs.id)
+      const res = await approveKrsAction(detail.id)
       if (res.success) {
         toast.success('KRS disetujui')
         setShowDetail(false)
@@ -118,7 +119,7 @@ export default function AdminKrsPage() {
   const handleReject = () => {
     if (!detail) return
     startTransition(async () => {
-      const res = await rejectKrsAction(detail.krs.id, rejectNote)
+      const res = await rejectKrsAction(detail.id, rejectNote)
       if (res.success) {
         toast.success('KRS ditolak')
         setShowReject(false)
@@ -165,13 +166,13 @@ export default function AdminKrsPage() {
         <p className="text-[10px] text-[#a1a1aa] ml-auto">{totalCount} data</p>
         <button
           onClick={() => {
-            const headers = ['NIM', 'Nama Mahasiswa', 'Prodi', 'Semester', 'Jumlah Kelas', 'Total SKS', 'Status', 'Dosen PA']
+            const headers = ['NIM', 'Nama Mahasiswa', 'Prodi', 'Sem', 'Jumlah Kelas', 'Total SKS', 'Status', 'Dosen PA']
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const rows = data.filter(Boolean).map((item: any) => [
               item.mahasiswa?.nim || '',
               item.mahasiswa?.nama_lengkap || '',
               item.mahasiswa?.program_studi?.kode || '',
-              item.semester?.nama || '',
+              hitungSemesterMahasiswa(item.mahasiswa?.angkatan, item.semester) !== null ? String(hitungSemesterMahasiswa(item.mahasiswa?.angkatan, item.semester)) : '',
               String(item.total_kelas || 0),
               String(item.total_sks || 0),
               item.status || '',
@@ -205,7 +206,7 @@ export default function AdminKrsPage() {
                   <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">NIM</TableHead>
                   <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">Nama Mahasiswa</TableHead>
                   <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">Prodi</TableHead>
-                  <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">Semester</TableHead>
+                  <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">Sem</TableHead>
                   <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">Kelas</TableHead>
                   <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">SKS</TableHead>
                   <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">Status</TableHead>
@@ -220,7 +221,7 @@ export default function AdminKrsPage() {
                     <TableCell className="text-sm font-mono font-medium text-[#09090b]">{item.mahasiswa?.nim || '—'}</TableCell>
                     <TableCell className="text-sm font-medium text-[#09090b]">{item.mahasiswa?.nama_lengkap || '—'}</TableCell>
                     <TableCell className="text-xs text-[#52525b]">{item.mahasiswa?.program_studi?.kode || '—'}</TableCell>
-                    <TableCell className="text-xs text-[#52525b]">{item.semester?.nama || '—'}</TableCell>
+                    <TableCell className="text-xs text-[#52525b]">{hitungSemesterMahasiswa(item.mahasiswa?.angkatan, item.semester) !== null ? `Semester ${hitungSemesterMahasiswa(item.mahasiswa?.angkatan, item.semester)}` : '—'}</TableCell>
                     <TableCell className="text-sm text-[#52525b]">{item.total_kelas || 0}</TableCell>
                     <TableCell className="text-sm text-[#52525b]">{item.total_sks || 0}</TableCell>
                     <TableCell>
@@ -298,23 +299,23 @@ export default function AdminKrsPage() {
             <div className="px-6 pb-6">
               {/* Info banner */}
               <div className={`flex items-center gap-2 px-4 py-2.5 rounded-[8px] text-xs font-medium mb-4 border ${
-                detail.krs.status === 'disetujui' ? 'bg-[#f0fdf4] text-[#15803d] border-[#bbf7d0]' :
-                detail.krs.status === 'diajukan' ? 'bg-[#fefce8] text-[#a16207] border-[#fef08a]' :
-                detail.krs.status === 'ditolak' ? 'bg-[#fef2f2] text-[#b91c1c] border-[#fecaca]' :
+                detail.status === 'disetujui' ? 'bg-[#f0fdf4] text-[#15803d] border-[#bbf7d0]' :
+                detail.status === 'diajukan' ? 'bg-[#fefce8] text-[#a16207] border-[#fef08a]' :
+                detail.status === 'ditolak' ? 'bg-[#fef2f2] text-[#b91c1c] border-[#fecaca]' :
                 'bg-[#f4f4f5] text-[#71717a] border-[#d4d4d8]'
               }`}>
-                {detail.krs.status === 'disetujui' ? <CheckCircle2 className="size-4 shrink-0" /> :
-                 detail.krs.status === 'diajukan' ? <Loader2 className="size-4 shrink-0" /> :
-                 detail.krs.status === 'ditolak' ? <XCircle className="size-4 shrink-0" /> :
+                {detail.status === 'disetujui' ? <CheckCircle2 className="size-4 shrink-0" /> :
+                 detail.status === 'diajukan' ? <Loader2 className="size-4 shrink-0" /> :
+                 detail.status === 'ditolak' ? <XCircle className="size-4 shrink-0" /> :
                  <BookOpen className="size-4 shrink-0" />}
                 <span>
                   Status: <strong>{
-                    detail.krs.status === 'disetujui' ? 'Disetujui' :
-                    detail.krs.status === 'diajukan' ? 'Menunggu' :
-                    detail.krs.status === 'ditolak' ? 'Ditolak' : 'Draft'
+                    detail.status === 'disetujui' ? 'Disetujui' :
+                    detail.status === 'diajukan' ? 'Menunggu' :
+                    detail.status === 'ditolak' ? 'Ditolak' : 'Draft'
                   }</strong>
-                  {detail.krs.catatan_dosen_pa && (
-                    <span className="ml-2">— {detail.krs.catatan_dosen_pa}</span>
+                  {detail.catatan_dosen_pa && (
+                    <span className="ml-2">— {detail.catatan_dosen_pa}</span>
                   )}
                 </span>
               </div>
@@ -371,7 +372,7 @@ export default function AdminKrsPage() {
               </div>
 
               {/* Admin override */}
-              {(detail.krs.status === 'diajukan') && (
+              {(detail.status === 'diajukan') && (
                 <div className="flex items-center justify-end gap-2 mt-6 pt-4 border-t border-[#ececee]">
                   <Button
                     variant="outline"

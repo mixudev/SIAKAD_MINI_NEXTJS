@@ -50,6 +50,8 @@ import {
   toggleUserBanAction,
 } from '@/actions/admin'
 import { registerUserAction } from '@/actions/auth'
+import { getActiveSemesterAction } from '@/actions/krs'
+import { hitungSemesterMahasiswa } from '@/lib/semester-utils'
 import { toast } from 'sonner'
 
 interface ProgramStudi { id: string; nama: string; kode: string }
@@ -88,6 +90,7 @@ export default function MahasiswaManagementPage() {
   const [isResetOpen, setIsResetOpen] = useState(false)
   const [isImportOpen, setIsImportOpen] = useState(false)
   const [selectedStudent, setSelectedStudent] = useState<Mahasiswa | null>(null)
+  const [semesterAktif, setSemesterAktif] = useState<{ nama: string; tahun_akademik: string } | null>(null)
 
   const [formData, setFormData] = useState({
     nim: '', nama_lengkap: '', program_studi_id: '',
@@ -105,6 +108,8 @@ export default function MahasiswaManagementPage() {
         setProdis(res.prodi as ProgramStudi[])
         setDosens(res.dosen as Dosen[])
       }
+      const sem = await getActiveSemesterAction()
+      setSemesterAktif(sem)
     }
     loadOptions()
   }, [])
@@ -287,13 +292,14 @@ export default function MahasiswaManagementPage() {
             </Button>
             <Button
               onClick={() => {
-                const headers = ['NIM', 'Nama', 'Program Studi', 'Angkatan', 'Status', 'Dosen PA']
+                const headers = ['NIM', 'Nama', 'Program Studi', 'Angkatan', 'Sem', 'Status', 'Dosen PA']
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const rows = students.filter(Boolean).map((s: any) => [
                   s.nim || '',
                   s.nama_lengkap || '',
                   s.program_studi?.nama || '',
                   String(s.angkatan || ''),
+                  hitungSemesterMahasiswa(s.angkatan, semesterAktif) !== null ? String(hitungSemesterMahasiswa(s.angkatan, semesterAktif)) : '',
                   s.status || '',
                   s.dosen_pa?.nama_lengkap || '',
                 ])
@@ -377,6 +383,7 @@ export default function MahasiswaManagementPage() {
                   <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">Nama Lengkap</TableHead>
                   <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">Program Studi</TableHead>
                   <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">Angkatan</TableHead>
+                  <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">Sem</TableHead>
                   <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">Dosen PA</TableHead>
                   <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">Status</TableHead>
                   <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider text-right">Aksi</TableHead>
@@ -389,6 +396,7 @@ export default function MahasiswaManagementPage() {
                     <TableCell className="text-sm font-medium text-[#09090b]">{student.nama_lengkap}</TableCell>
                     <TableCell className="text-sm text-[#52525b]">{student.program_studi?.kode || '—'}</TableCell>
                     <TableCell className="text-sm text-[#52525b]">{student.angkatan}</TableCell>
+                    <TableCell className="text-sm text-[#52525b]">{hitungSemesterMahasiswa(student.angkatan, semesterAktif) !== null ? `Semester ${hitungSemesterMahasiswa(student.angkatan, semesterAktif)}` : '—'}</TableCell>
                     <TableCell className="text-sm text-[#52525b]">{student.dosen_pa?.nama_lengkap || '—'}</TableCell>
                     <TableCell>
                       <Badge

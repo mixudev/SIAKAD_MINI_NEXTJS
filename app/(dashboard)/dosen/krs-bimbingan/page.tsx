@@ -45,6 +45,7 @@ import {
   rejectKrsAction,
 } from '@/actions/krs'
 import { Input } from '@/components/ui/input'
+import { hitungSemesterMahasiswa } from '@/lib/semester-utils'
 import { toast } from 'sonner'
 
 const filterStatus: { value: string; label: string }[] = [
@@ -64,6 +65,7 @@ export default function KrsBimbinganPage() {
   const [filter, setFilter] = useState('semua')
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [detail, setDetail] = useState<any>(null)
+  const [semesterAktif, setSemesterAktif] = useState<{ nama: string; tahun_akademik: string } | null>(null)
   const [showDetail, setShowDetail] = useState(false)
   const [showApprove, setShowApprove] = useState(false)
   const [showReject, setShowReject] = useState(false)
@@ -72,7 +74,10 @@ export default function KrsBimbinganPage() {
   const loadData = useCallback(async () => {
     setLoading(true)
     const res = await getKrsBimbinganAction()
-    if (res.success) setData(res.data || [])
+    if (res.success) {
+      setData(res.data || [])
+      if (res.semester) setSemesterAktif(res.semester)
+    }
     setLoading(false)
   }, [])
 
@@ -177,6 +182,7 @@ export default function KrsBimbinganPage() {
               <TableRow className="bg-[#f4f4f5]">
                 <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">NIM</TableHead>
                 <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">Nama</TableHead>
+                <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">Sem</TableHead>
                 <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">Kelas</TableHead>
                 <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">SKS</TableHead>
                 <TableHead className="text-[#71717a] text-xs font-semibold uppercase tracking-wider">Status</TableHead>
@@ -189,6 +195,7 @@ export default function KrsBimbinganPage() {
                 <TableRow key={item.id || item.nim} className="border-b border-[#ececee]">
                   <TableCell className="text-sm font-mono font-medium text-[#09090b]">{item.nim || '—'}</TableCell>
                   <TableCell className="text-sm font-medium text-[#09090b]">{item.nama_lengkap || '—'}</TableCell>
+                  <TableCell className="text-xs text-[#52525b]">{hitungSemesterMahasiswa(item.angkatan, semesterAktif) !== null ? `Semester ${hitungSemesterMahasiswa(item.angkatan, semesterAktif)}` : '—'}</TableCell>
                   <TableCell className="text-sm text-[#52525b]">{item.total_kelas || 0}</TableCell>
                   <TableCell className="text-sm text-[#52525b]">{item.total_sks || 0}</TableCell>
                   <TableCell>
