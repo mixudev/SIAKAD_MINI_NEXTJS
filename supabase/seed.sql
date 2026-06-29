@@ -1,14 +1,12 @@
 -- ============================================================
--- SIAKAD MINI — Seed Data untuk Testing
--- Jalankan file ini di Supabase SQL Editor SETELAH
--- menjalankan migration 20260629000000_init_schema.sql
+-- SIAKAD MINI � Comprehensive Seed Data for Demo
+-- Jalankan SETELAH migration 20260629000000_init_schema.sql
 -- ============================================================
 
--- Enable pgcrypto untuk hashing password
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- ============================================================
--- 1. DATA MASTER: Program Studi
+-- 1. PROGRAM STUDI
 -- ============================================================
 INSERT INTO public.program_studi (id, nama, kode) VALUES
   ('a1000000-0000-0000-0000-000000000001', 'Teknik Informatika', 'TI'),
@@ -17,110 +15,347 @@ INSERT INTO public.program_studi (id, nama, kode) VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================
--- 2. DATA MASTER: Semester Aktif
+-- 2. SEMESTER (nama disingkat)
 -- ============================================================
 INSERT INTO public.semester (id, nama, tahun_akademik, tanggal_mulai, tanggal_selesai, is_active) VALUES
-  ('b1000000-0000-0000-0000-000000000001', 'Ganjil 2025/2026', '2025/2026', '2025-09-01', '2026-01-31', true)
+  ('b1000000-0000-0000-0000-000000000001', 'Ganjil', '2025/2026', '2025-09-01', '2026-01-31', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================
--- 3. AKUN AUTH: Buat 3 user di auth.users dengan shadow email
--- Password untuk semua akun: password
+-- 3. AUTH USERS (admin + 3 dosen + 10 mahasiswa)
+-- Password untuk semua: password
 -- ============================================================
-
--- User: Admin
-INSERT INTO auth.users (
-  id, instance_id, email, encrypted_password, email_confirmed_at,
-  role, aud, created_at, updated_at,
-  raw_app_meta_data, raw_user_meta_data, confirmation_token, recovery_token
-) VALUES (
-  'c1000000-0000-0000-0000-000000000001',
-  '00000000-0000-0000-0000-000000000000',
-  'admin.siakad@internal.siakad.local',
-  crypt('password', gen_salt('bf')),
-  now(), 'authenticated', 'authenticated', now(), now(),
-  '{"provider":"email","providers":["email"],"role":"admin"}'::jsonb,
-  '{"nama_lengkap":"Administrator SIAKAD"}'::jsonb,
-  '', ''
-) ON CONFLICT (id) DO NOTHING;
-
--- User: Dosen
-INSERT INTO auth.users (
-  id, instance_id, email, encrypted_password, email_confirmed_at,
-  role, aud, created_at, updated_at,
-  raw_app_meta_data, raw_user_meta_data, confirmation_token, recovery_token
-) VALUES (
-  'c1000000-0000-0000-0000-000000000002',
-  '00000000-0000-0000-0000-000000000000',
-  '0123456789@internal.siakad.local',
-  crypt('password', gen_salt('bf')),
-  now(), 'authenticated', 'authenticated', now(), now(),
-  '{"provider":"email","providers":["email"],"role":"dosen"}'::jsonb,
-  '{"nama_lengkap":"Dr. Budi Santoso, M.Kom"}'::jsonb,
-  '', ''
-) ON CONFLICT (id) DO NOTHING;
-
--- User: Mahasiswa
-INSERT INTO auth.users (
-  id, instance_id, email, encrypted_password, email_confirmed_at,
-  role, aud, created_at, updated_at,
-  raw_app_meta_data, raw_user_meta_data, confirmation_token, recovery_token
-) VALUES (
-  'c1000000-0000-0000-0000-000000000003',
-  '00000000-0000-0000-0000-000000000000',
-  '2021310045@internal.siakad.local',
-  crypt('password', gen_salt('bf')),
-  now(), 'authenticated', 'authenticated', now(), now(),
-  '{"provider":"email","providers":["email"],"role":"mahasiswa"}'::jsonb,
-  '{"nama_lengkap":"Rina Aulia Putri"}'::jsonb,
-  '', ''
-) ON CONFLICT (id) DO NOTHING;
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, role, aud, created_at, updated_at, raw_app_meta_data, raw_user_meta_data, confirmation_token, recovery_token) VALUES
+('c1000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'admin@internal.siakad.local', crypt('password', gen_salt('bf')), now(), 'authenticated', 'authenticated', now(), now(), '{"provider":"email","providers":["email"],"role":"admin"}'::jsonb, '{"nama_lengkap":"Administrator SIAKAD"}'::jsonb, '', ''),
+('c1000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000000', '0123456789@internal.siakad.local', crypt('password', gen_salt('bf')), now(), 'authenticated', 'authenticated', now(), now(), '{"provider":"email","providers":["email"],"role":"dosen"}'::jsonb, '{"nama_lengkap":"Dr. Budi Santoso, M.Kom"}'::jsonb, '', ''),
+('c1000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000000', '0112233445@internal.siakad.local', crypt('password', gen_salt('bf')), now(), 'authenticated', 'authenticated', now(), now(), '{"provider":"email","providers":["email"],"role":"dosen"}'::jsonb, '{"nama_lengkap":"Dr. Siti Rahmawati, M.T."}'::jsonb, '', ''),
+('c1000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000000', '0112334455@internal.siakad.local', crypt('password', gen_salt('bf')), now(), 'authenticated', 'authenticated', now(), now(), '{"provider":"email","providers":["email"],"role":"dosen"}'::jsonb, '{"nama_lengkap":"Ahmad Fauzi, S.Kom, M.Kom."}'::jsonb, '', ''),
+('c1000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000000', '2021310045@internal.siakad.local', crypt('password', gen_salt('bf')), now(), 'authenticated', 'authenticated', now(), now(), '{"provider":"email","providers":["email"],"role":"mahasiswa"}'::jsonb, '{"nama_lengkap":"Rina Aulia Putri"}'::jsonb, '', ''),
+('c1000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000000', '2022310046@internal.siakad.local', crypt('password', gen_salt('bf')), now(), 'authenticated', 'authenticated', now(), now(), '{"provider":"email","providers":["email"],"role":"mahasiswa"}'::jsonb, '{"nama_lengkap":"Budi Hartono"}'::jsonb, '', ''),
+('c1000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000000', '2022310047@internal.siakad.local', crypt('password', gen_salt('bf')), now(), 'authenticated', 'authenticated', now(), now(), '{"provider":"email","providers":["email"],"role":"mahasiswa"}'::jsonb, '{"nama_lengkap":"Sari Dewi Lestari"}'::jsonb, '', ''),
+('c1000000-0000-0000-0000-000000000008', '00000000-0000-0000-0000-000000000000', '2023310048@internal.siakad.local', crypt('password', gen_salt('bf')), now(), 'authenticated', 'authenticated', now(), now(), '{"provider":"email","providers":["email"],"role":"mahasiswa"}'::jsonb, '{"nama_lengkap":"Dimas Ardiansyah"}'::jsonb, '', ''),
+('c1000000-0000-0000-0000-000000000009', '00000000-0000-0000-0000-000000000000', '2023310049@internal.siakad.local', crypt('password', gen_salt('bf')), now(), 'authenticated', 'authenticated', now(), now(), '{"provider":"email","providers":["email"],"role":"mahasiswa"}'::jsonb, '{"nama_lengkap":"Putri Ayu Wulandari"}'::jsonb, '', ''),
+('c1000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000000', '2024310050@internal.siakad.local', crypt('password', gen_salt('bf')), now(), 'authenticated', 'authenticated', now(), now(), '{"provider":"email","providers":["email"],"role":"mahasiswa"}'::jsonb, '{"nama_lengkap":"Fajar Ramadhan"}'::jsonb, '', ''),
+('c1000000-0000-0000-0000-000000000011', '00000000-0000-0000-0000-000000000000', '2024310051@internal.siakad.local', crypt('password', gen_salt('bf')), now(), 'authenticated', 'authenticated', now(), now(), '{"provider":"email","providers":["email"],"role":"mahasiswa"}'::jsonb, '{"nama_lengkap":"Nita Anggraini"}'::jsonb, '', ''),
+('c1000000-0000-0000-0000-000000000012', '00000000-0000-0000-0000-000000000000', '2024310052@internal.siakad.local', crypt('password', gen_salt('bf')), now(), 'authenticated', 'authenticated', now(), now(), '{"provider":"email","providers":["email"],"role":"mahasiswa"}'::jsonb, '{"nama_lengkap":"Gilang Pratama"}'::jsonb, '', ''),
+('c1000000-0000-0000-0000-000000000013', '00000000-0000-0000-0000-000000000000', '2024310053@internal.siakad.local', crypt('password', gen_salt('bf')), now(), 'authenticated', 'authenticated', now(), now(), '{"provider":"email","providers":["email"],"role":"mahasiswa"}'::jsonb, '{"nama_lengkap":"Indah Permata Sari"}'::jsonb, '', ''),
+('c1000000-0000-0000-0000-000000000014', '00000000-0000-0000-0000-000000000000', '2024310054@internal.siakad.local', crypt('password', gen_salt('bf')), now(), 'authenticated', 'authenticated', now(), now(), '{"provider":"email","providers":["email"],"role":"mahasiswa"}'::jsonb, '{"nama_lengkap":"Rizky Firmansyah"}'::jsonb, '', '')
+ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================
--- 4. PROFIL PUBLIC: users table
+-- 4. PUBLIC USERS
 -- ============================================================
 INSERT INTO public.users (id, role, username, created_at, updated_at) VALUES
-  ('c1000000-0000-0000-0000-000000000001', 'admin',     'admin.siakad', now(), now()),
-  ('c1000000-0000-0000-0000-000000000002', 'dosen',     '0123456789',   now(), now()),
-  ('c1000000-0000-0000-0000-000000000003', 'mahasiswa', '2021310045',   now(), now())
+  ('c1000000-0000-0000-0000-000000000001', 'admin',     'admin',       now(), now()),
+  ('c1000000-0000-0000-0000-000000000002', 'dosen',     '0123456789',  now(), now()),
+  ('c1000000-0000-0000-0000-000000000003', 'dosen',     '0112233445',  now(), now()),
+  ('c1000000-0000-0000-0000-000000000004', 'dosen',     '0112334455',  now(), now()),
+  ('c1000000-0000-0000-0000-000000000005', 'mahasiswa', '2021310045',  now(), now()),
+  ('c1000000-0000-0000-0000-000000000006', 'mahasiswa', '2022310046',  now(), now()),
+  ('c1000000-0000-0000-0000-000000000007', 'mahasiswa', '2022310047',  now(), now()),
+  ('c1000000-0000-0000-0000-000000000008', 'mahasiswa', '2023310048',  now(), now()),
+  ('c1000000-0000-0000-0000-000000000009', 'mahasiswa', '2023310049',  now(), now()),
+  ('c1000000-0000-0000-0000-000000000010', 'mahasiswa', '2024310050',  now(), now()),
+  ('c1000000-0000-0000-0000-000000000011', 'mahasiswa', '2024310051',  now(), now()),
+  ('c1000000-0000-0000-0000-000000000012', 'mahasiswa', '2024310052',  now(), now()),
+  ('c1000000-0000-0000-0000-000000000013', 'mahasiswa', '2024310053',  now(), now()),
+  ('c1000000-0000-0000-0000-000000000014', 'mahasiswa', '2024310054',  now(), now())
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================
--- 5. PROFIL DOSEN
+-- 5. DOSEN (3 orang � masing-masing nanti pegang 4-5 matkul)
 -- ============================================================
 INSERT INTO public.dosen (id, user_id, nidn, nama_lengkap, program_studi_id, jabatan_akademik) VALUES
-  (
-    'd1000000-0000-0000-0000-000000000001',
-    'c1000000-0000-0000-0000-000000000002',
-    '0123456789',
-    'Dr. Budi Santoso, M.Kom',
-    'a1000000-0000-0000-0000-000000000001',
-    'Lektor Kepala'
-  )
+  ('d1000000-0000-0000-0000-000000000001', 'c1000000-0000-0000-0000-000000000002', '0123456789', 'Dr. Budi Santoso, M.Kom',  'a1000000-0000-0000-0000-000000000001', 'Lektor Kepala'),
+  ('d1000000-0000-0000-0000-000000000002', 'c1000000-0000-0000-0000-000000000003', '0112233445', 'Dr. Siti Rahmawati, M.T.', 'a1000000-0000-0000-0000-000000000001', 'Lektor'),
+  ('d1000000-0000-0000-0000-000000000003', 'c1000000-0000-0000-0000-000000000004', '0112334455', 'Ahmad Fauzi, S.Kom, M.Kom.', 'a1000000-0000-0000-0000-000000000001', 'Asisten Ahli')
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================
--- 6. PROFIL MAHASISWA
+-- 6. MAHASISWA (10 orang, 7 with KRS, 3 without)
 -- ============================================================
 INSERT INTO public.mahasiswa (id, user_id, nim, nama_lengkap, program_studi_id, angkatan, status, dosen_pa_id) VALUES
-  (
-    'e1000000-0000-0000-0000-000000000001',
-    'c1000000-0000-0000-0000-000000000003',
-    '2021310045',
-    'Rina Aulia Putri',
-    'a1000000-0000-0000-0000-000000000001',
-    2021,
-    'aktif',
-    'd1000000-0000-0000-0000-000000000001' -- Dosen PA: Dr. Budi
-  )
+  ('e1000000-0000-0000-0000-000000000001', 'c1000000-0000-0000-0000-000000000005', '2021310045', 'Rina Aulia Putri',      'a1000000-0000-0000-0000-000000000001', 2021, 'aktif', 'd1000000-0000-0000-0000-000000000001'),
+  ('e1000000-0000-0000-0000-000000000002', 'c1000000-0000-0000-0000-000000000006', '2022310046', 'Budi Hartono',          'a1000000-0000-0000-0000-000000000001', 2022, 'aktif', 'd1000000-0000-0000-0000-000000000001'),
+  ('e1000000-0000-0000-0000-000000000003', 'c1000000-0000-0000-0000-000000000007', '2022310047', 'Sari Dewi Lestari',     'a1000000-0000-0000-0000-000000000001', 2022, 'aktif', 'd1000000-0000-0000-0000-000000000001'),
+  ('e1000000-0000-0000-0000-000000000004', 'c1000000-0000-0000-0000-000000000008', '2023310048', 'Dimas Ardiansyah',      'a1000000-0000-0000-0000-000000000001', 2023, 'aktif', 'd1000000-0000-0000-0000-000000000001'),
+  ('e1000000-0000-0000-0000-000000000005', 'c1000000-0000-0000-0000-000000000009', '2023310049', 'Putri Ayu Wulandari',   'a1000000-0000-0000-0000-000000000002', 2023, 'aktif', 'd1000000-0000-0000-0000-000000000001'),
+  ('e1000000-0000-0000-0000-000000000006', 'c1000000-0000-0000-0000-000000000010', '2024310050', 'Fajar Ramadhan',        'a1000000-0000-0000-0000-000000000003', 2024, 'aktif', 'd1000000-0000-0000-0000-000000000001'),
+  ('e1000000-0000-0000-0000-000000000007', 'c1000000-0000-0000-0000-000000000011', '2024310051', 'Nita Anggraini',        'a1000000-0000-0000-0000-000000000003', 2024, 'aktif', 'd1000000-0000-0000-0000-000000000001'),
+  -- 3 MAHASISWA TANPA KRS (untuk demo ambil KRS)
+  ('e1000000-0000-0000-0000-000000000008', 'c1000000-0000-0000-0000-000000000012', '2024310052', 'Gilang Pratama',        'a1000000-0000-0000-0000-000000000001', 2024, 'aktif', 'd1000000-0000-0000-0000-000000000001'),
+  ('e1000000-0000-0000-0000-000000000009', 'c1000000-0000-0000-0000-000000000013', '2024310053', 'Indah Permata Sari',    'a1000000-0000-0000-0000-000000000001', 2024, 'aktif', 'd1000000-0000-0000-0000-000000000001'),
+  ('e1000000-0000-0000-0000-000000000010', 'c1000000-0000-0000-0000-000000000014', '2024310054', 'Rizky Firmansyah',      'a1000000-0000-0000-0000-000000000002', 2023, 'aktif', 'd1000000-0000-0000-0000-000000000001')
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================
--- SELESAI! Akun siap digunakan:
+-- 7. MATA KULIAH (14 � untuk Ganjil sem 1,3,5,7)
+-- ============================================================
+INSERT INTO public.mata_kuliah (id, kode_matkul, nama, sks, program_studi_id, semester_ke) VALUES
+  -- TI
+  ('f1000000-0000-0000-0000-000000000001', 'TI101', 'Pengantar Teknologi Informasi',  2, 'a1000000-0000-0000-0000-000000000001', 1),
+  ('f1000000-0000-0000-0000-000000000002', 'TI103', 'Algoritma dan Pemrograman I',    3, 'a1000000-0000-0000-0000-000000000001', 1),
+  ('f1000000-0000-0000-0000-000000000003', 'TI301', 'Pemrograman Web',                3, 'a1000000-0000-0000-0000-000000000001', 3),
+  ('f1000000-0000-0000-0000-000000000004', 'TI302', 'Basis Data II',                  3, 'a1000000-0000-0000-0000-000000000001', 3),
+  ('f1000000-0000-0000-0000-000000000005', 'TI303', 'Jaringan Komputer',              3, 'a1000000-0000-0000-0000-000000000001', 3),
+  ('f1000000-0000-0000-0000-000000000006', 'TI501', 'Data Mining',                    3, 'a1000000-0000-0000-0000-000000000001', 5),
+  ('f1000000-0000-0000-0000-000000000007', 'TI502', 'Keamanan Informasi',             3, 'a1000000-0000-0000-0000-000000000001', 5),
+  ('f1000000-0000-0000-0000-000000000008', 'TI701', 'Skripsi',                        6, 'a1000000-0000-0000-0000-000000000001', 7),
+  -- SI
+  ('f1000000-0000-0000-0000-000000000009', 'SI101', 'Pengantar Sistem Informasi',     2, 'a1000000-0000-0000-0000-000000000002', 1),
+  ('f1000000-0000-0000-0000-000000000010', 'SI301', 'Sistem Basis Data',              3, 'a1000000-0000-0000-0000-000000000002', 3),
+  ('f1000000-0000-0000-0000-000000000011', 'SI302', 'E-Business',                     3, 'a1000000-0000-0000-0000-000000000002', 3),
+  -- MB
+  ('f1000000-0000-0000-0000-000000000012', 'MB101', 'Pengantar Manajemen',            2, 'a1000000-0000-0000-0000-000000000003', 1),
+  ('f1000000-0000-0000-0000-000000000013', 'MB301', 'Manajemen Keuangan',             3, 'a1000000-0000-0000-0000-000000000003', 3),
+  ('f1000000-0000-0000-0000-000000000014', 'MB302', 'Pemasaran Digital',              3, 'a1000000-0000-0000-0000-000000000003', 3)
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================================================
+-- 8. KELAS (16 � kapasitas 5-10 agar variasi terlihat)
+-- ============================================================
+INSERT INTO public.kelas (id, mata_kuliah_id, semester_id, dosen_id, nama_kelas, kapasitas) VALUES
+  -- TI101: 2 kelas
+  ('g1000000-0000-0000-0000-000000000001', 'f1000000-0000-0000-0000-000000000001', 'b1000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000001', 'TI101-A', 6),
+  ('g1000000-0000-0000-0000-000000000002', 'f1000000-0000-0000-0000-000000000001', 'b1000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000003', 'TI101-B', 6),
+  -- TI103: 1 kelas
+  ('g1000000-0000-0000-0000-000000000003', 'f1000000-0000-0000-0000-000000000002', 'b1000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000002', 'TI103-A', 6),
+  -- TI301: 2 kelas
+  ('g1000000-0000-0000-0000-000000000004', 'f1000000-0000-0000-0000-000000000003', 'b1000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000001', 'TI301-A', 6),
+  ('g1000000-0000-0000-0000-000000000005', 'f1000000-0000-0000-0000-000000000003', 'b1000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000002', 'TI301-B', 6),
+  -- TI302: 1 kelas
+  ('g1000000-0000-0000-0000-000000000006', 'f1000000-0000-0000-0000-000000000004', 'b1000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000002', 'TI302-A', 6),
+  -- TI303: 1 kelas
+  ('g1000000-0000-0000-0000-000000000007', 'f1000000-0000-0000-0000-000000000005', 'b1000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000003', 'TI303-A', 6),
+  -- TI501: 2 kelas
+  ('g1000000-0000-0000-0000-000000000008', 'f1000000-0000-0000-0000-000000000006', 'b1000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000001', 'TI501-A', 6),
+  ('g1000000-0000-0000-0000-000000000009', 'f1000000-0000-0000-0000-000000000006', 'b1000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000002', 'TI501-B', 6),
+  -- TI502: 1 kelas
+  ('g1000000-0000-0000-0000-000000000010', 'f1000000-0000-0000-0000-000000000007', 'b1000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000003', 'TI502-A', 6),
+  -- TI701: 1 kelas
+  ('g1000000-0000-0000-0000-000000000011', 'f1000000-0000-0000-0000-000000000008', 'b1000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000002', 'TI701-A', 5),
+  -- SI101: 1 kelas
+  ('g1000000-0000-0000-0000-000000000012', 'f1000000-0000-0000-0000-000000000009', 'b1000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000002', 'SI101-A', 6),
+  -- SI301: 1 kelas
+  ('g1000000-0000-0000-0000-000000000013', 'f1000000-0000-0000-0000-000000000010', 'b1000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000002', 'SI301-A', 6),
+  -- SI302: 1 kelas
+  ('g1000000-0000-0000-0000-000000000014', 'f1000000-0000-0000-0000-000000000011', 'b1000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000003', 'SI302-A', 6),
+  -- MB101: 1 kelas
+  ('g1000000-0000-0000-0000-000000000015', 'f1000000-0000-0000-0000-000000000012', 'b1000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000001', 'MB101-A', 6),
+  -- MB302: 1 kelas (kosong, untuk demo)
+  ('g1000000-0000-0000-0000-000000000016', 'f1000000-0000-0000-0000-000000000014', 'b1000000-0000-0000-0000-000000000001', 'd1000000-0000-0000-0000-000000000003', 'MB302-A', 6)
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================================================
+-- 9. JADWAL (1 per kelas)
+-- ============================================================
+INSERT INTO public.jadwal (id, kelas_id, hari, jam_mulai, jam_selesai, ruangan) VALUES
+  ('h1000000-0000-0000-0000-000000000001', 'g1000000-0000-0000-0000-000000000001', 'Senin',    '07:00', '08:40', 'Lab Komputer 1'),
+  ('h1000000-0000-0000-0000-000000000002', 'g1000000-0000-0000-0000-000000000002', 'Senin',    '09:00', '10:40', 'Lab Komputer 2'),
+  ('h1000000-0000-0000-0000-000000000003', 'g1000000-0000-0000-0000-000000000003', 'Selasa',   '07:00', '09:30', 'Lab Komputer 1'),
+  ('h1000000-0000-0000-0000-000000000004', 'g1000000-0000-0000-0000-000000000004', 'Selasa',   '10:00', '12:30', 'Lab Komputer 3'),
+  ('h1000000-0000-0000-0000-000000000005', 'g1000000-0000-0000-0000-000000000005', 'Rabu',     '07:00', '09:30', 'Lab Komputer 2'),
+  ('h1000000-0000-0000-0000-000000000006', 'g1000000-0000-0000-0000-000000000006', 'Rabu',     '10:00', '12:30', 'Lab Komputer 1'),
+  ('h1000000-0000-0000-0000-000000000007', 'g1000000-0000-0000-0000-000000000007', 'Kamis',    '07:00', '09:30', 'Lab Jaringan'),
+  ('h1000000-0000-0000-0000-000000000008', 'g1000000-0000-0000-0000-000000000008', 'Kamis',    '10:00', '12:30', 'Lab Komputer 1'),
+  ('h1000000-0000-0000-0000-000000000009', 'g1000000-0000-0000-0000-000000000009', 'Jumat',    '07:00', '09:30', 'Lab Komputer 3'),
+  ('h1000000-0000-0000-0000-000000000010', 'g1000000-0000-0000-0000-000000000010', 'Jumat',    '10:00', '12:30', 'Lab Komputer 2'),
+  ('h1000000-0000-0000-0000-000000000011', 'g1000000-0000-0000-0000-000000000011', 'Senin',    '13:00', '15:30', 'Ruang Bimbingan'),
+  ('h1000000-0000-0000-0000-000000000012', 'g1000000-0000-0000-0000-000000000012', 'Selasa',   '13:00', '14:40', 'Ruang 201'),
+  ('h1000000-0000-0000-0000-000000000013', 'g1000000-0000-0000-0000-000000000013', 'Rabu',     '13:00', '15:30', 'Lab Komputer 1'),
+  ('h1000000-0000-0000-0000-000000000014', 'g1000000-0000-0000-0000-000000000014', 'Kamis',    '13:00', '15:30', 'Lab Komputer 2'),
+  ('h1000000-0000-0000-0000-000000000015', 'g1000000-0000-0000-0000-000000000015', 'Jumat',    '13:00', '14:40', 'Ruang 202'),
+  ('h1000000-0000-0000-0000-000000000016', 'g1000000-0000-0000-0000-000000000016', 'Sabtu',    '08:00', '10:30', 'Ruang 203')
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================================================
+-- 10. KRS (7 mahasiswa dengan KRS)
+-- Mahasiswa tanpa KRS: Gilang (e8), Indah (e9), Rizky (e10)
+-- ============================================================
+INSERT INTO public.krs (id, mahasiswa_id, semester_id, status, tanggal_pengajuan, disetujui_oleh, catatan_dosen_pa) VALUES
+  ('i1000000-0000-0000-0000-000000000001', 'e1000000-0000-0000-0000-000000000001', 'b1000000-0000-0000-0000-000000000001', 'disetujui', '2025-09-05 08:00:00+07', 'd1000000-0000-0000-0000-000000000001', NULL),
+  ('i1000000-0000-0000-0000-000000000002', 'e1000000-0000-0000-0000-000000000002', 'b1000000-0000-0000-0000-000000000001', 'disetujui', '2025-09-06 09:00:00+07', 'd1000000-0000-0000-0000-000000000001', NULL),
+  ('i1000000-0000-0000-0000-000000000003', 'e1000000-0000-0000-0000-000000000003', 'b1000000-0000-0000-0000-000000000001', 'diajukan',  '2025-09-07 10:00:00+07', NULL, NULL),
+  ('i1000000-0000-0000-0000-000000000004', 'e1000000-0000-0000-0000-000000000004', 'b1000000-0000-0000-0000-000000000001', 'diajukan',  '2025-09-08 11:00:00+07', NULL, NULL),
+  ('i1000000-0000-0000-0000-000000000005', 'e1000000-0000-0000-0000-000000000005', 'b1000000-0000-0000-0000-000000000001', 'disetujui', '2025-09-05 08:30:00+07', 'd1000000-0000-0000-0000-000000000001', NULL),
+  ('i1000000-0000-0000-0000-000000000006', 'e1000000-0000-0000-0000-000000000006', 'b1000000-0000-0000-0000-000000000001', 'draft',     NULL, NULL, NULL),
+  ('i1000000-0000-0000-0000-000000000007', 'e1000000-0000-0000-0000-000000000007', 'b1000000-0000-0000-0000-000000000001', 'ditolak',  '2025-09-10 14:00:00+07', 'd1000000-0000-0000-0000-000000000001', 'SKS tidak sesuai dengan ketentuan. Silakan sesuaikan kembali.')
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================================================
+-- 11. KRS DETAIL (mapping KRS ke kelas)
+-- ============================================================
+INSERT INTO public.krs_detail (id, krs_id, kelas_id) VALUES
+  -- Rina (KRS1) ? Skripsi
+  ('j1000000-0000-0000-0000-000000000001', 'i1000000-0000-0000-0000-000000000001', 'g1000000-0000-0000-0000-000000000011'),
+  -- Budi H (KRS2) ? Data Mining A + Keamanan Informasi
+  ('j1000000-0000-0000-0000-000000000002', 'i1000000-0000-0000-0000-000000000002', 'g1000000-0000-0000-0000-000000000008'),
+  ('j1000000-0000-0000-0000-000000000003', 'i1000000-0000-0000-0000-000000000002', 'g1000000-0000-0000-0000-000000000010'),
+  -- Sari (KRS3) ? Data Mining B
+  ('j1000000-0000-0000-0000-000000000004', 'i1000000-0000-0000-0000-000000000003', 'g1000000-0000-0000-0000-000000000009'),
+  -- Dimas (KRS4) ? Pemrograman Web A + Basis Data II + Jaringan Komputer
+  ('j1000000-0000-0000-0000-000000000005', 'i1000000-0000-0000-0000-000000000004', 'g1000000-0000-0000-0000-000000000004'),
+  ('j1000000-0000-0000-0000-000000000006', 'i1000000-0000-0000-0000-000000000004', 'g1000000-0000-0000-0000-000000000006'),
+  ('j1000000-0000-0000-0000-000000000007', 'i1000000-0000-0000-0000-000000000004', 'g1000000-0000-0000-0000-000000000007'),
+  -- Putri (KRS5) ? Sistem Basis Data + E-Business
+  ('j1000000-0000-0000-0000-000000000008', 'i1000000-0000-0000-0000-000000000005', 'g1000000-0000-0000-0000-000000000013'),
+  ('j1000000-0000-0000-0000-000000000009', 'i1000000-0000-0000-0000-000000000005', 'g1000000-0000-0000-0000-000000000014'),
+  -- Fajar (KRS6) ? MB101-A (draft)
+  ('j1000000-0000-0000-0000-000000000010', 'i1000000-0000-0000-0000-000000000006', 'g1000000-0000-0000-0000-000000000015'),
+  -- Nita (KRS7) ? MB302-A (ditolak)
+  ('j1000000-0000-0000-0000-000000000011', 'i1000000-0000-0000-0000-000000000007', 'g1000000-0000-0000-0000-000000000016')
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================================================
+-- 12. PERTEMUAN (8 per kelas yang punya enrollment)
+-- Kelas dengan siswa: 1,3,4,6,7,8,9,10,11,13,14,15,16
+-- ============================================================
+DO $$
+DECLARE
+  kelas_ids uuid[] := ARRAY[
+    'g1000000-0000-0000-0000-000000000001',
+    'g1000000-0000-0000-0000-000000000003',
+    'g1000000-0000-0000-0000-000000000004',
+    'g1000000-0000-0000-0000-000000000006',
+    'g1000000-0000-0000-0000-000000000007',
+    'g1000000-0000-0000-0000-000000000008',
+    'g1000000-0000-0000-0000-000000000009',
+    'g1000000-0000-0000-0000-000000000010',
+    'g1000000-0000-0000-0000-000000000011',
+    'g1000000-0000-0000-0000-000000000013',
+    'g1000000-0000-0000-0000-000000000014',
+    'g1000000-0000-0000-0000-000000000015',
+    'g1000000-0000-0000-0000-000000000016'
+  ];
+  k_id uuid;
+  p_id uuid;
+  week int;
+BEGIN
+  FOREACH k_id IN ARRAY kelas_ids LOOP
+    FOR week IN 1..8 LOOP
+      p_id := gen_random_uuid();
+      INSERT INTO public.pertemuan (id, kelas_id, pertemuan_ke, tanggal, materi)
+      VALUES (
+        p_id,
+        k_id,
+        week,
+        ('2025-09-01'::date + (week * 7 || ' days')::interval)::date,
+        'Pertemuan ' || week
+      )
+      ON CONFLICT (id) DO NOTHING;
+    END LOOP;
+  END LOOP;
+END $$;
+
+-- ============================================================
+-- 13. ABSENSI (~30% terisi � cukup 2-3 pertemuan per kelas)
+-- Isi untuk kelas yang punya enrollment, beberapa mahasiswa
+-- ============================================================
+INSERT INTO public.absensi (id, pertemuan_id, mahasiswa_id, status, keterangan)
+SELECT
+  gen_random_uuid(),
+  p.id,
+  kd.mahasiswa_id,
+  CASE floor(random() * 4)
+    WHEN 0 THEN 'hadir'::text
+    WHEN 1 THEN 'hadir'::text
+    WHEN 2 THEN 'hadir'::text
+    WHEN 3 THEN 'sakit'::text
+    ELSE 'izin'::text
+  END,
+  NULL
+FROM public.pertemuan p
+JOIN public.krs_detail kd ON kd.kelas_id = p.kelas_id
+WHERE p.pertemuan_ke IN (1, 2, 3)  -- hanya 3 pertemuan pertama
+  AND EXISTS (
+    SELECT 1 FROM public.krs k
+    WHERE k.id = kd.krs_id AND k.status IN ('disetujui', 'diajukan')
+  )
+ON CONFLICT DO NOTHING;
+
+-- ============================================================
+-- 14. KOMPONEN NILAI (3 per kelas: Tugas, UTS, UAS)
+-- ============================================================
+INSERT INTO public.komponen_nilai (id, kelas_id, nama_komponen, bobot_persen)
+SELECT
+  gen_random_uuid(),
+  k.id,
+  kn.nama,
+  kn.bobot
+FROM public.kelas k
+CROSS JOIN (
+  VALUES
+    ('Tugas', 30),
+    ('UTS', 35),
+    ('UAS', 35)
+) AS kn(nama, bobot)
+WHERE k.id IN (
+  'g1000000-0000-0000-0000-000000000003',
+  'g1000000-0000-0000-0000-000000000004',
+  'g1000000-0000-0000-0000-000000000006',
+  'g1000000-0000-0000-0000-000000000007',
+  'g1000000-0000-0000-0000-000000000008',
+  'g1000000-0000-0000-0000-000000000009',
+  'g1000000-0000-0000-0000-000000000010',
+  'g1000000-0000-0000-0000-000000000011',
+  'g1000000-0000-0000-0000-000000000013',
+  'g1000000-0000-0000-0000-000000000014'
+)
+ON CONFLICT DO NOTHING;
+
+-- ============================================================
+-- 15. NILAI (isi untuk kelas yang disetujui)
+-- ============================================================
+INSERT INTO public.nilai (id, komponen_nilai_id, mahasiswa_id, nilai_angka)
+SELECT
+  gen_random_uuid(),
+  kn.id,
+  kd.mahasiswa_id,
+  floor(random() * 40 + 60)  -- nilai 60-100
+FROM public.komponen_nilai kn
+JOIN public.kelas k ON k.id = kn.kelas_id
+JOIN public.krs_detail kd ON kd.kelas_id = k.id
+JOIN public.krs krs ON krs.id = kd.krs_id
+WHERE krs.status = 'disetujui'
+ON CONFLICT DO NOTHING;
+
+-- ============================================================
+-- 16. NILAI AKHIR (isi untuk kelas yang disetujui)
+-- ============================================================
+INSERT INTO public.nilai_akhir (id, mahasiswa_id, kelas_id, nilai_angka_akhir, nilai_huruf)
+SELECT
+  gen_random_uuid(),
+  kd.mahasiswa_id,
+  k.id,
+  floor(random() * 30 + 70),
+  CASE
+    WHEN floor(random() * 30 + 70) >= 80 THEN 'A'
+    WHEN floor(random() * 30 + 70) >= 70 THEN 'B'
+    ELSE 'C'
+  END
+FROM public.kelas k
+JOIN public.krs_detail kd ON kd.kelas_id = k.id
+JOIN public.krs krs ON krs.id = kd.krs_id
+WHERE krs.status = 'disetujui'
+ON CONFLICT DO NOTHING;
+
+-- ============================================================
+-- SELESAI! Ringkasan Akun Demo:
 --
--- Role      | Login Identifier     | Password
--- ----------|----------------------|------------------
--- Admin     | admin.siakad         | password
--- Dosen     | 0123456789 (NIDN)    | password
--- Mahasiswa | 2021310045 (NIM)     | password
+-- Role      | Login          | Password  | Keterangan
+-- ----------|----------------|-----------|---------------------------
+-- Admin     | admin          | password  | Full akses
+-- Dosen     | 0123456789     | password  | Budi (PA + 5 kelas)
+-- Dosen     | 0112233445     | password  | Siti (6 kelas)
+-- Dosen     | 0112334455     | password  | Ahmad (5 kelas)
+-- Mahasiswa | 2021310045     | password  | Rina � KRS disetujui
+-- Mahasiswa | 2022310046     | password  | Budi H � KRS disetujui
+-- Mahasiswa | 2022310047     | password  | Sari � KRS diajukan
+-- Mahasiswa | 2023310048     | password  | Dimas � KRS diajukan
+-- Mahasiswa | 2023310049     | password  | Putri � KRS disetujui
+-- Mahasiswa | 2024310050     | password  | Fajar � KRS draft
+-- Mahasiswa | 2024310051     | password  | Nita � KRS ditolak
+-- Mahasiswa | 2024310052     | password  | Gilang � BELUM KRS
+-- Mahasiswa | 2024310053     | password  | Indah � BELUM KRS
+-- Mahasiswa | 2024310054     | password  | Rizky � BELUM KRS
 -- ============================================================
